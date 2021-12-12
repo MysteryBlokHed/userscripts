@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/package",
   "name": "userscripts",
   "version": "0.1.0",
-  "description": "Some of my GreaseMonkey UserScripts",
+  "description": "GreaseMonkey UserScripts I've written",
   "private": true,
   "repository": "https://gitlab.com/MysteryBlokHed/userscripts",
   "author": "Adam Thompson-Sharpe",

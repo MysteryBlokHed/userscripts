@@ -1,6 +1,6 @@
 # UserScripts
 
-Some of my UserScripts.
+GreaseMonkey UserScripts I've written.
 
 ## License
 
