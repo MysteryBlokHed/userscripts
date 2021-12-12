@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/package",
+  "name": "userscripts",
+  "version": "0.1.0",
+  "description": "Some of my GreaseMonkey UserScripts",
+  "private": true,
+  "repository": "https://gitlab.com/MysteryBlokHed/userscripts",
+  "author": "Adam Thompson-Sharpe",
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "tsc && yarn prettier --write **/*.js",
+    "dev": "nodemon -w **/* -e ts --exec \"yarn build || exit 1\"",
+    "lint": "prettier \"**/*.{js,ts,json,md,yml}\""
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.3"
+  }
+}
