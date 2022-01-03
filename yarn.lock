@@ -14,6 +14,11 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
+"@types/greasemonkey@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/greasemonkey/-/greasemonkey-4.0.2.tgz#cb378ee2b0d567ab988819ed4abe65a950afa352"
+  integrity sha512-aCdl08liJA/GaT5xH8bhqbGCG6HCRU/jqs3QuJcMOsSxBDgbiif3LVLI7AF7FekPN3XxGevRHSw7ov8ITKf4Hw==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
