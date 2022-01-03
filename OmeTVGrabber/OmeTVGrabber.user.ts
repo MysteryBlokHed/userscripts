@@ -26,6 +26,7 @@
     ipContainer.style.textAlign = 'center'
     ipEl = document.createElement('span')
     ipEl.style.fontWeight = 'bold'
+    ipEl.style.userSelect = 'text'
     ipEl.innerText = `IP: ${currentIp}`
     ipContainer.appendChild(ipEl)
     buttonArea?.prepend(ipContainer)
