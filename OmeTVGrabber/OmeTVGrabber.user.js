@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        OmeTV Grabber
-// @description Get IP addresses of users on OmeTV
+// @description Get the relay IP addresses of users on OmeTV
 // @version     0.1.0
 // @author      Adam Thompson-Sharpe
 // @match       *://*.ome.tv/*
