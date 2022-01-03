@@ -4,7 +4,7 @@
 // @version     0.1.0
 // @author      Adam Thompson-Sharpe
 // @match       *://*.ome.tv/*
-// @grant       none
+// @grant       GM.xmlHttpRequest
 // ==/UserScript==
 ;(() => {
   /** OmeTV hijacks most logging functions, but they forgot about groups for some reason */
@@ -14,21 +14,65 @@
   }
   let lastCandidateType
   let currentIp = 'Not Found'
-  let ipEl
-  const setupIpContainer = () => {
-    /* Set up container for IP */
-    const buttonArea = document.querySelector('.buttons')
-    if (!buttonArea) setTimeout(setupIpContainer, 1000)
-    const ipContainer = document.createElement('div')
-    ipContainer.style.textAlign = 'center'
-    ipEl = document.createElement('span')
-    ipEl.style.fontWeight = 'bold'
-    ipEl.style.userSelect = 'text'
-    ipEl.innerText = `IP: ${currentIp}`
-    ipContainer.appendChild(ipEl)
-    buttonArea?.prepend(ipContainer)
+  const sendXhrPromise = xhrInfo =>
+    new Promise((resolve, reject) => {
+      let lastState = XMLHttpRequest.UNSENT
+      GM.xmlHttpRequest({
+        ...xhrInfo,
+        onreadystatechange: response => {
+          if (response.readyState === XMLHttpRequest.DONE) {
+            if (lastState < 3) reject(new Error(`XHR request failed`))
+            else resolve(response)
+          }
+          lastState = response.readyState
+        },
+      })
+    })
+  /** Look up ip info */
+  const findIpInfo = async ip =>
+    new Promise((resolve, reject) => {
+      sendXhrPromise({
+        method: 'GET',
+        url: `https://ipinfo.io/${ip}/json`,
+      })
+        .then(({ responseText }) => {
+          const info = JSON.parse(responseText)
+          resolve({
+            ip,
+            country: info.country,
+            region: info.region,
+            city: info.city,
+            org: info.org,
+          })
+        })
+        .catch(reason => {
+          groupLog('Failed to get IP info, reason:', reason)
+          resolve({ ip })
+        })
+    })
+  /** Add IP info to the chatbox */
+  const addIpInfo = (
+    ip,
+    country = 'Not Found',
+    region = 'Not Found',
+    city = 'Not Found',
+    org = 'Not Found'
+  ) => {
+    groupLog('called')
+    const chat = document.querySelector('.message.system')
+    if (!chat) return
+    const messageContainer = document.createElement('div')
+    messageContainer.className = 'message in'
+    messageContainer.style.textAlign = 'center'
+    const message = document.createElement('span')
+    message.innerText = `Relay IP: ${ip}
+Country: ${country}
+Region: ${region}
+City: ${city}
+Org: ${org}\n`
+    messageContainer.appendChild(message)
+    chat.prepend(messageContainer)
   }
-  setupIpContainer()
   /**
    * Proxy handler for the RTCPeerConnection.prototype.addIceCandidate function
    */
@@ -41,9 +85,11 @@
       groupLog('Related:\t', candidate.relatedAddress)
       console.groupEnd()
       if (candidate.type === 'relay' && lastCandidateType !== 'relay') {
-        currentIp = candidate.address
-        groupLog('!!! IP FOUND !!! ', candidate.address)
-        if (ipEl) ipEl.innerText = `IP: ${candidate.address}`
+        currentIp = candidate.address ?? 'Not Found'
+        groupLog('!!! IP FOUND !!! ', currentIp)
+        findIpInfo(currentIp).then(info =>
+          addIpInfo(info.ip, info.country, info.region, info.city, info.org)
+        )
       }
       lastCandidateType = candidate.type
       return Reflect.apply(target, thisArg, args)
@@ -52,10 +98,10 @@
   /** Update the IP display when connections are closed */
   const closeHandler = {
     apply(target, thisArg, args) {
-      if (ipEl && currentIp !== 'Not Found') {
-        ipEl.innerText = `IP: Not Found (Last: ${currentIp})`
-        currentIp = 'Not Found'
-      }
+      // if (currentIp !== 'Not Found') {
+      //   currentIp = `Not Found (Last: ${currentIp})`
+      //   currentIp = 'Not Found'
+      // }
       return Reflect.apply(target, thisArg, args)
     },
   }
