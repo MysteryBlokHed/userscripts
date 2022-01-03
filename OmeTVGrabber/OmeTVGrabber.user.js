@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        OmeTV Grabber
 // @description Get the relay IP addresses of users on OmeTV
-// @version     0.1.0
+// @version     0.2.0
 // @author      Adam Thompson-Sharpe
 // @match       *://*.ome.tv/*
 // @grant       GM.xmlHttpRequest
@@ -58,7 +58,6 @@
     city = 'Not Found',
     org = 'Not Found'
   ) => {
-    groupLog('called')
     const chat = document.querySelector('.message.system')
     if (!chat) return
     const messageContainer = document.createElement('div')
@@ -86,31 +85,18 @@ Org: ${org}\n`
       console.groupEnd()
       if (candidate.type === 'relay' && lastCandidateType !== 'relay') {
         currentIp = candidate.address ?? 'Not Found'
-        groupLog('!!! IP FOUND !!! ', currentIp)
-        findIpInfo(currentIp).then(info =>
+        groupLog('IP FOUND:', currentIp)
+        findIpInfo(currentIp).then(info => {
+          groupLog('IP INFO:', info)
           addIpInfo(info.ip, info.country, info.region, info.city, info.org)
-        )
+        })
       }
       lastCandidateType = candidate.type
-      return Reflect.apply(target, thisArg, args)
-    },
-  }
-  /** Update the IP display when connections are closed */
-  const closeHandler = {
-    apply(target, thisArg, args) {
-      // if (currentIp !== 'Not Found') {
-      //   currentIp = `Not Found (Last: ${currentIp})`
-      //   currentIp = 'Not Found'
-      // }
       return Reflect.apply(target, thisArg, args)
     },
   }
   RTCPeerConnection.prototype.addIceCandidate = new Proxy(
     RTCPeerConnection.prototype.addIceCandidate,
     addIceCandidateHandler
-  )
-  RTCPeerConnection.prototype.close = new Proxy(
-    RTCPeerConnection.prototype.close,
-    closeHandler
   )
 })()
