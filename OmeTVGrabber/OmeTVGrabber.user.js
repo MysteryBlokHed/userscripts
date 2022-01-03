@@ -46,7 +46,7 @@
           })
         })
         .catch(reason => {
-          groupLog('Failed to get IP info, reason:', reason)
+          groupLog('Failed to get IP info from ipinfo.io')
           resolve({ ip })
         })
     })
