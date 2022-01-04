@@ -5,8 +5,11 @@
 // @author      Adam Thompson-Sharpe
 // @match       *://*.ome.tv/*
 // @grant       GM.xmlHttpRequest
+// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/df110500/greasetools.user.js
 // ==/UserScript==
+/// <reference types="greasetools" />
 ;(() => {
+  const { xhrPromise } = GreaseTools
   /** OmeTV hijacks most logging functions, but they forgot about groups for some reason */
   const groupLog = (...data) => {
     console.groupCollapsed(...data)
@@ -14,24 +17,10 @@
   }
   let lastCandidateType
   let currentIp = 'Not Found'
-  const sendXhrPromise = xhrInfo =>
-    new Promise((resolve, reject) => {
-      let lastState = XMLHttpRequest.UNSENT
-      GM.xmlHttpRequest({
-        ...xhrInfo,
-        onreadystatechange: response => {
-          if (response.readyState === XMLHttpRequest.DONE) {
-            if (lastState < 3) reject(new Error(`XHR request failed`))
-            else resolve(response)
-          }
-          lastState = response.readyState
-        },
-      })
-    })
   /** Look up ip info */
   const findIpInfo = async ip =>
     new Promise((resolve, reject) => {
-      sendXhrPromise({
+      xhrPromise({
         method: 'GET',
         url: `https://ipinfo.io/${ip}/json`,
       })
@@ -45,7 +34,7 @@
             org: info.org,
           })
         })
-        .catch(reason => {
+        .catch(() => {
           groupLog('Failed to get IP info from ipinfo.io')
           resolve({ ip })
         })
