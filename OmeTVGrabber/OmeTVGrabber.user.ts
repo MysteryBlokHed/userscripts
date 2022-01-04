@@ -5,8 +5,12 @@
 // @author      Adam Thompson-Sharpe
 // @match       *://*.ome.tv/*
 // @grant       GM.xmlHttpRequest
+// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/df110500/greasetools.user.js
 // ==/UserScript==
+/// <reference types="greasetools" />
 ;(() => {
+  const { xhrPromise } = GreaseTools
+
   interface IpInfo {
     ip: string
     country?: string
@@ -24,28 +28,10 @@
   let lastCandidateType: RTCIceCandidateType | null
   let currentIp: string = 'Not Found'
 
-  const sendXhrPromise = (
-    xhrInfo: Omit<GM.Request, 'onreadystatechange'>
-  ): Promise<GM.Response<GM.Request>> =>
-    new Promise((resolve, reject) => {
-      let lastState = XMLHttpRequest.UNSENT
-
-      GM.xmlHttpRequest({
-        ...xhrInfo,
-        onreadystatechange: response => {
-          if (response.readyState === XMLHttpRequest.DONE) {
-            if (lastState < 3) reject(new Error(`XHR request failed`))
-            else resolve(response)
-          }
-          lastState = response.readyState
-        },
-      })
-    })
-
   /** Look up ip info */
   const findIpInfo = async (ip: string): Promise<IpInfo> =>
     new Promise((resolve, reject) => {
-      sendXhrPromise({
+      xhrPromise({
         method: 'GET',
         url: `https://ipinfo.io/${ip}/json`,
       })
@@ -59,7 +45,7 @@
             org: info.org,
           })
         })
-        .catch(reason => {
+        .catch(() => {
           groupLog('Failed to get IP info from ipinfo.io')
           resolve({ ip })
         })
