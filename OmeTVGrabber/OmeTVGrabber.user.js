@@ -19,20 +19,14 @@
   let currentIp = 'Not Found'
   /** Look up ip info */
   const findIpInfo = async ip =>
-    new Promise((resolve, reject) => {
+    new Promise(resolve => {
       xhrPromise({
         method: 'GET',
         url: `https://ipinfo.io/${ip}/json`,
       })
         .then(({ responseText }) => {
           const info = JSON.parse(responseText)
-          resolve({
-            ip,
-            country: info.country,
-            region: info.region,
-            city: info.city,
-            org: info.org,
-          })
+          resolve({ ip, ...info })
         })
         .catch(() => {
           groupLog('Failed to get IP info from ipinfo.io')
@@ -68,7 +62,7 @@ Org: ${org}\n`
     apply(target, thisArg, args) {
       const candidate = args[0]
       console.groupCollapsed('Candidate', candidate, 'added')
-      groupLog('Type:\t', candidate.type)
+      groupLog('Type:\t\t', candidate.type)
       groupLog('Address:\t', candidate.address)
       groupLog('Related:\t', candidate.relatedAddress)
       console.groupEnd()
