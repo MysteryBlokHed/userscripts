@@ -14,6 +14,11 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
+"@types/greasemonkey@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/greasemonkey/-/greasemonkey-4.0.2.tgz#cb378ee2b0d567ab988819ed4abe65a950afa352"
+  integrity sha512-aCdl08liJA/GaT5xH8bhqbGCG6HCRU/jqs3QuJcMOsSxBDgbiif3LVLI7AF7FekPN3XxGevRHSw7ov8ITKf4Hw==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -291,6 +296,12 @@ graceful-fs@^4.1.2:
   version "4.2.8"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
+
+"greasetools@https://gitlab.com/MysteryBlokHed/greasetools.git":
+  version "0.3.0"
+  resolved "https://gitlab.com/MysteryBlokHed/greasetools.git#df11050077ca566bc5ed2da1484e5af956c31959"
+  dependencies:
+    "@types/greasemonkey" "^4.0.2"
 
 has-flag@^3.0.0:
   version "3.0.0"
