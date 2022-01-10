@@ -3,6 +3,7 @@
 // @description Get the relay IP addresses of users on OmeTV
 // @version     0.2.0
 // @author      Adam Thompson-Sharpe
+// @license     GPL-3.0
 // @match       *://*.ome.tv/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/df110500/greasetools.user.js
