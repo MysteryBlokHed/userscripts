@@ -1,6 +1,7 @@
 # PollEvReveal
 
-Show the names of people who submitted answers on Poll Everywhere
+Show the names of people who submitted answers on Poll Everywhere.
+This currently only works for Q&A questions.
 
 ## Use
 
