@@ -19,7 +19,6 @@
   /** Observe the answers element for changes */
   const observer = new MutationObserver(mutationsList => {
     for (const mutation of mutationsList) {
-      console.log(mutation)
       if (mutation.type === 'childList') {
         // If the participant element was removed, add it back
         const removedEl = Array.from(mutation.removedNodes).find(
