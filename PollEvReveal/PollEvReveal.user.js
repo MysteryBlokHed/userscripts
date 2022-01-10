@@ -22,13 +22,11 @@
       console.log(mutation)
       if (mutation.type === 'childList') {
         // If the participant element was removed, add it back
-        const removed = Array.from(mutation.removedNodes)
-        if (
-          removed.length &&
-          removed.some(el => el.className === 'component-response-qa__result')
-        ) {
-          mutation.target.appendChild(removed[0])
-        }
+        const removedEl = Array.from(mutation.removedNodes).find(
+          el => el.className === 'component-response-qa__result'
+        )
+        console.log(removedEl)
+        if (removedEl) mutation.target.appendChild(removedEl)
 
         // Unhide participants
         mutation.target
@@ -46,7 +44,13 @@
       /** Element containing everybody's answers */
       const answers = document.querySelector('.component-list')
       if (answers && !answersExist) {
+        // Unhide existing participants if there are any
         showParticipants(document.body)
+        // Disable new/top buttons (cause an infinite loop with the MutationObserver)
+        document
+          .querySelectorAll('input[name=sort76]')
+          .forEach(el => (el.disabled = true))
+        // Observer answers
         observer.observe(answers, { childList: true, subtree: true })
         answersExist = true
       } else {
