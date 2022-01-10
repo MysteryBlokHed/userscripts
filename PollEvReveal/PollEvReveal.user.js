@@ -40,21 +40,19 @@
 
   let answersExist = false
 
-  const answersPoll = () => {
-    // Wait until the answers element exists before trying to observe it
-    const answersPollInterval = setInterval(() => {
+  /** Wait until the answers element exists before trying to observe it */
+  const answersPoll = () =>
+    setInterval(() => {
       /** Element containing everybody's answers */
       const answers = document.querySelector('.component-list')
       if (answers && !answersExist) {
         showParticipants(document.body)
         observer.observe(answers, { childList: true, subtree: true })
         answersExist = true
-        // clearInterval(answersPollInterval)
       } else {
         answersExist = false
       }
     }, 1000)
-  }
 
   answersPoll()
 })()
