@@ -38,27 +38,23 @@
     }
   })
 
+  let answersExist = false
+
   const answersPoll = () => {
     // Wait until the answers element exists before trying to observe it
     const answersPollInterval = setInterval(() => {
       /** Element containing everybody's answers */
       const answers = document.querySelector('.component-list')
-      if (answers) {
+      if (answers && !answersExist) {
         showParticipants(document.body)
         observer.observe(answers, { childList: true, subtree: true })
-        clearInterval(answersPollInterval)
+        answersExist = true
+        // clearInterval(answersPollInterval)
+      } else {
+        answersExist = false
       }
     }, 1000)
   }
 
-  /** @type {ProxyHandler<typeof history['pushState']>} */
-  const pushStateHandler = {
-    apply(target, thisArg, args) {
-      answersPoll()
-      return Reflect.apply(target, thisArg, args)
-    },
-  }
-
-  history.pushState = new Proxy(history.pushState, pushStateHandler)
   answersPoll()
 })()
