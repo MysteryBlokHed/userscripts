@@ -20,7 +20,24 @@
     org?: string
   }
 
-  /** OmeTV hijacks most logging functions, but they forgot about groups for some reason */
+  /**
+   * Get the active site
+   * @returns The active site
+   * @throws {Error} Thrown if an unsupported site is visited
+   */
+  const getSite = () => {
+    switch (location.hostname) {
+      case 'ome.tv':
+        return 'ometv' as const
+      default:
+        throw new Error('Activated on unsupported site')
+    }
+  }
+
+  /** The active site */
+  const site = getSite()
+
+  /** Some sites hijack most logging functions, but they tend to forget about groups */
   const groupLog = (...data: any[]) => {
     console.groupCollapsed(...data)
     console.groupEnd()
@@ -54,21 +71,39 @@
     city = 'Not Found',
     org = 'Not Found'
   ) => {
-    const chat = document.querySelector('.message.system')
-    if (!chat) return
+    /** The element to add the IP info to */
+    const message = (() => {
+      switch (site) {
+        case 'ometv':
+          const chat = document.querySelector('.message.system')
+          if (!chat) return
 
-    const messageContainer = document.createElement('div')
-    messageContainer.className = 'message in'
-    messageContainer.style.textAlign = 'center'
-    const message = document.createElement('span')
+          const messageContainer = document.createElement('div')
+          messageContainer.className = 'message in'
+          messageContainer.style.textAlign = 'center'
+          const message = document.createElement('span')
+
+          messageContainer.appendChild(message)
+          chat.prepend(messageContainer)
+          return message
+      }
+    })() as HTMLElement
+
     message.innerText = `Relay IP: ${ip}
-Country: ${country}
-Region: ${region}
-City: ${city}
-Org: ${org}\n`
+    Country: ${country}
+    Region: ${region}
+    City: ${city}
+    Org: ${org}\n`
+  }
 
-    messageContainer.appendChild(message)
-    chat.prepend(messageContainer)
+  const targetIp = (candidate: RTCIceCandidate): string | null => {
+    switch (site) {
+      case 'ometv':
+        if (candidate.type === 'relay' && lastCandidateType !== 'relay')
+          return candidate.address
+        break
+    }
+    return null
   }
 
   /**
@@ -86,8 +121,9 @@ Org: ${org}\n`
       groupLog('Related:\t', candidate.relatedAddress)
       console.groupEnd()
 
-      if (candidate.type === 'relay' && lastCandidateType !== 'relay') {
-        currentIp = candidate.address ?? 'Not Found'
+      const ip = targetIp(candidate)
+      if (ip) {
+        currentIp = ip
         groupLog('IP FOUND:', currentIp)
         findIpInfo(currentIp).then(info => {
           groupLog('IP INFO:', info)
@@ -95,7 +131,7 @@ Org: ${org}\n`
         })
       }
 
-      lastCandidateType = candidate.type
+      if (candidate.type) lastCandidateType = candidate.type
       return Reflect.apply(target, thisArg, args)
     },
   }
