@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name        OmeTV Grabber
-// @description Get the relay IP addresses of users on OmeTV
+// @name        Omegle Grabber
+// @description Get IP addresses on multiple video chat sites
 // @version     0.2.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
