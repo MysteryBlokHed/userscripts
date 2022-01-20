@@ -6,32 +6,35 @@
 // @license     GPL-3.0
 // @match       *://*.ome.tv/*
 // @grant       GM.xmlHttpRequest
-// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/df110500/greasetools.user.js
+// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
 /// <reference types="greasetools" />
 ;(() => {
   const { xhrPromise } = GreaseTools
-  const domainMap = {
+  const siteMap = {
     'ome.tv': 'ometv',
   }
-  let lastCandidateType
   let currentIp = 'Not Found'
   const Sites = {
     ometv: {
+      lastCandidateType: 'relay',
       getIp(candidate) {
+        const lastCandidateType = this.lastCandidateType
+        this.lastCandidateType = candidate.type
         if (candidate.type === 'relay' && lastCandidateType !== 'relay')
           return candidate.address
         return null
       },
-      getMessageElement() {
+      addIpInfo(message) {
         const chat = document.querySelector('.message.system')
+        if (!chat) return
         const messageContainer = document.createElement('div')
         messageContainer.className = 'message in'
         messageContainer.style.textAlign = 'center'
-        const message = document.createElement('span')
-        messageContainer.appendChild(message)
+        const messageEl = document.createElement('span')
+        messageContainer.appendChild(messageEl)
         chat.prepend(messageContainer)
-        return message
+        messageEl.innerText = message
       },
     },
   }
@@ -41,7 +44,7 @@
    * @throws {Error} Thrown if an unsupported site is visited
    */
   const getSite = () => {
-    const site = domainMap[location.hostname]
+    const site = siteMap[location.hostname]
     if (!site) throw new Error('Activated on unsupported site')
     return site
   }
@@ -53,7 +56,7 @@
     console.groupEnd()
   }
   /** Look up ip info */
-  const findIpInfo = async ip =>
+  const findIpInfo = ip =>
     new Promise(resolve => {
       xhrPromise({
         method: 'GET',
@@ -76,13 +79,12 @@
     city = 'Not Found',
     org = 'Not Found'
   ) => {
-    /** The element to add the IP info to */
-    const message = Sites[site].getMessageElement()
-    message.innerText = `Relay IP: ${ip}
-    Country: ${country}
-    Region: ${region}
-    City: ${city}
-    Org: ${org}\n`
+    Sites[site].addIpInfo(`\
+Relay IP: ${ip}
+Country: ${country}
+Region: ${region}
+City: ${city}
+Org: ${org}\n`)
   }
   /**
    * Proxy handler for the RTCPeerConnection.prototype.addIceCandidate function
@@ -104,7 +106,6 @@
           addIpInfo(info.ip, info.country, info.region, info.city, info.org)
         })
       }
-      if (candidate.type) lastCandidateType = candidate.type
       return Reflect.apply(target, thisArg, args)
     },
   }

@@ -38,10 +38,10 @@
      */
     getIp(candidate: RTCIceCandidate | RTCIceCandidateInit): string | null
     /**
-     * Should return an element to add IP address information to, if possible.
+     * Should add the given message somewhere the user can easily see it.
      * It's safe to assume that this will only even be called after `getIp`
      */
-    getMessageElement(): HTMLElement
+    addIpInfo(message: string): void
   }
 
   interface LastCandidateSite extends Site {
@@ -61,17 +61,18 @@
         return null
       },
 
-      getMessageElement() {
-        const chat = document.querySelector('.message.system') as HTMLElement
+      addIpInfo(message) {
+        const chat = document.querySelector('.message.system')
+        if (!chat) return
 
         const messageContainer = document.createElement('div')
         messageContainer.className = 'message in'
         messageContainer.style.textAlign = 'center'
-        const message = document.createElement('span')
+        const messageEl = document.createElement('span')
 
-        messageContainer.appendChild(message)
+        messageContainer.appendChild(messageEl)
         chat.prepend(messageContainer)
-        return message
+        messageEl.innerText = message
       },
     } as LastCandidateSite,
   } as const
@@ -97,7 +98,7 @@
   }
 
   /** Look up ip info */
-  const findIpInfo = async (ip: string): Promise<IpInfo> =>
+  const findIpInfo = (ip: string): Promise<IpInfo> =>
     new Promise(resolve => {
       xhrPromise({
         method: 'GET',
@@ -121,14 +122,12 @@
     city = 'Not Found',
     org = 'Not Found'
   ) => {
-    /** The element to add the IP info to */
-    const message = Sites[site].getMessageElement()
-
-    message.innerText = `Relay IP: ${ip}
-    Country: ${country}
-    Region: ${region}
-    City: ${city}
-    Org: ${org}\n`
+    Sites[site].addIpInfo(`\
+Relay IP: ${ip}
+Country: ${country}
+Region: ${region}
+City: ${city}
+Org: ${org}\n`)
   }
 
   /**
