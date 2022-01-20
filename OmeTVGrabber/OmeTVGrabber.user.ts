@@ -29,7 +29,7 @@
     org?: string
   }
 
-  /** Per-site logic to get the IP and add it to the page */
+  /** Per-site logic to get the IP and add its info to the page */
   interface Site {
     /**
      * Given an RTCIceCandidate, should return either the IP address of the target
@@ -44,6 +44,7 @@
     addIpInfo(message: string): void
   }
 
+  /** Interface for a site that needs to store the type of the last candidate */
   interface LastCandidateSite extends Site {
     /** The type of the last ICE candidate to be connected to */
     lastCandidateType: RTCIceCandidateType | null
@@ -52,6 +53,7 @@
   const Sites: Record<SiteName, Site> = {
     ometv: {
       lastCandidateType: 'relay',
+
       getIp(candidate: RTCIceCandidate) {
         const lastCandidateType = this.lastCandidateType
         this.lastCandidateType = candidate.type
