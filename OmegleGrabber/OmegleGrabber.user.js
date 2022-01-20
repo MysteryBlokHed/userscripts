@@ -75,9 +75,7 @@
     emeraldchat: {
       getIp: srflxIp,
       addIpInfo(message) {
-        groupLog(this.ipInfoEl)
         if (!this.ipInfoEl) {
-          groupLog('dont exist?')
           const chatbox = document.querySelector('#messages')
           if (!chatbox) return
           this.ipInfoEl = document.createElement('p')
@@ -85,6 +83,9 @@
           chatbox.prepend(this.ipInfoEl)
         }
         this.ipInfoEl.innerText = message
+      },
+      rtcClose() {
+        this.addIpInfo(currentIp)
       },
     },
   }
@@ -158,8 +159,23 @@ Org: ${org}\n`)
       return Reflect.apply(target, thisArg, args)
     },
   }
+  /**
+   * Proxy handler for the RTCPeerConnection.prototype.close function
+   */
+  const closeHandler = {
+    apply(target, thisArg, args) {
+      currentIp = 'Not Found'
+      // Call rtcClose if defined
+      Sites[site].rtcClose?.()
+      return Reflect.apply(target, thisArg, args)
+    },
+  }
   RTCPeerConnection.prototype.addIceCandidate = new Proxy(
     RTCPeerConnection.prototype.addIceCandidate,
     addIceCandidateHandler
+  )
+  RTCPeerConnection.prototype.close = new Proxy(
+    RTCPeerConnection.prototype.close,
+    closeHandler
   )
 })()

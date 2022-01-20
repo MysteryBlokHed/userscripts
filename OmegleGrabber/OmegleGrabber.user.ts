@@ -48,6 +48,8 @@
      * It's safe to assume that this will only even be called after `getIp`
      */
     addIpInfo(message: string): void
+    /** Called whenever an RTCPeerConnection is closed */
+    rtcClose?(): void
   }
 
   /** Interface for a site that needs to store the type of the last candidate */
@@ -135,9 +137,7 @@
       getIp: srflxIp,
 
       addIpInfo(message) {
-        groupLog(this.ipInfoEl)
         if (!this.ipInfoEl) {
-          groupLog('dont exist?')
           const chatbox = document.querySelector(
             '#messages'
           ) as HTMLElement | null
@@ -149,6 +149,10 @@
         }
 
         this.ipInfoEl.innerText = message
+      },
+
+      rtcClose() {
+        this.addIpInfo(currentIp)
       },
     } as IpElSite,
   }
@@ -235,8 +239,29 @@ Org: ${org}\n`)
     },
   }
 
+  /**
+   * Proxy handler for the RTCPeerConnection.prototype.close function
+   */
+  const closeHandler: ProxyHandler<
+    typeof RTCPeerConnection['prototype']['close']
+  > = {
+    apply(target, thisArg: RTCPeerConnection, args) {
+      currentIp = 'Not Found'
+
+      // Call rtcClose if defined
+      Sites[site].rtcClose?.()
+
+      return Reflect.apply(target, thisArg, args)
+    },
+  }
+
   RTCPeerConnection.prototype.addIceCandidate = new Proxy(
     RTCPeerConnection.prototype.addIceCandidate,
     addIceCandidateHandler
+  )
+
+  RTCPeerConnection.prototype.close = new Proxy(
+    RTCPeerConnection.prototype.close,
+    closeHandler
   )
 })()
