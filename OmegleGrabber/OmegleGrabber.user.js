@@ -7,6 +7,7 @@
 // @match       *://*.omegle.com/*
 // @match       *://*.ome.tv/*
 // @match       *://*.chathub.cam/*
+// @match       *://*.emeraldchat.com/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
@@ -17,6 +18,7 @@
     'www.omegle.com': 'omegle',
     'ome.tv': 'ometv',
     'chathub.cam': 'chathub',
+    'www.emeraldchat.com': 'emeraldchat',
   }
   let currentIp = 'Not Found'
   const srflxIp = candidate => {
@@ -54,9 +56,9 @@
         messageContainer.className = 'message in'
         messageContainer.style.textAlign = 'center'
         const messageEl = document.createElement('span')
+        messageEl.innerText = message
         messageContainer.appendChild(messageEl)
         chat.prepend(messageContainer)
-        messageEl.innerText = message
       },
     },
     chathub: {
@@ -67,7 +69,22 @@
         const messageEl = document.createElement('p')
         messageEl.style.textAlign = 'center'
         messageEl.innerText = message
-        chatbox.appendChild(messageEl)
+        chatbox.prepend(messageEl)
+      },
+    },
+    emeraldchat: {
+      getIp: srflxIp,
+      addIpInfo(message) {
+        groupLog(this.ipInfoEl)
+        if (!this.ipInfoEl) {
+          groupLog('dont exist?')
+          const chatbox = document.querySelector('#messages')
+          if (!chatbox) return
+          this.ipInfoEl = document.createElement('p')
+          this.ipInfoEl.style.textAlign = 'center'
+          chatbox.prepend(this.ipInfoEl)
+        }
+        this.ipInfoEl.innerText = message
       },
     },
   }
@@ -130,7 +147,7 @@ Org: ${org}\n`)
       groupLog('Related:\t', candidate.relatedAddress)
       console.groupEnd()
       const ip = Sites[site].getIp(candidate)
-      if (ip) {
+      if (ip && ip !== currentIp) {
         currentIp = ip
         groupLog('IP FOUND:', currentIp)
         findIpInfo(currentIp).then(info => {

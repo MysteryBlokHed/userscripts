@@ -7,6 +7,7 @@ Get IP addresses on multiple video chat sites.
 - [Omegle](https://www.omegle.com/)
 - [OmeTV](https://ome.tv/)
 - [ChatHub](https://chathub.cam/)
+- [Emerald Chat](https://www.emeraldchat.com/)
 
 ## Use
 
