@@ -4,8 +4,9 @@
 // @version     0.2.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
-// @match       *://*.ome.tv/*
 // @match       *://*.omegle.com/*
+// @match       *://*.ome.tv/*
+// @match       *://*.chathub.cam/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
@@ -15,20 +16,22 @@
   const SiteMap = {
     'www.omegle.com': 'omegle',
     'ome.tv': 'ometv',
+    'chathub.cam': 'chathub',
   }
   let currentIp = 'Not Found'
+  const srflxIp = candidate => {
+    if (!candidate.candidate || !candidate.candidate.includes('typ srflx'))
+      return null
+    const addresses = candidate.candidate.match(
+      /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g
+    )
+    return addresses ? addresses[0] ?? null : null
+  }
   const Sites = {
     // TODO: Verify that this actually works
     // I'm IP banned from Omegle so I'm writing this from what I vaguely remember working last time
     omegle: {
-      getIp(candidate) {
-        if (!candidate.candidate || !candidate.candidate.includes('typ srflx'))
-          return null
-        const addresses = candidate.candidate.match(
-          /\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/g
-        )
-        return addresses ? addresses[1] ?? null : null
-      },
+      getIp: srflxIp,
       addIpInfo(message) {
         const chatbox = document.querySelector('.logbox > .logitem.info')
         if (!chatbox) return
@@ -54,6 +57,17 @@
         messageContainer.appendChild(messageEl)
         chat.prepend(messageContainer)
         messageEl.innerText = message
+      },
+    },
+    chathub: {
+      getIp: srflxIp,
+      addIpInfo(message) {
+        const chatbox = document.querySelector('#message-section')
+        if (!chatbox) return
+        const messageEl = document.createElement('p')
+        messageEl.style.textAlign = 'center'
+        messageEl.innerText = message
+        chatbox.appendChild(messageEl)
       },
     },
   }
