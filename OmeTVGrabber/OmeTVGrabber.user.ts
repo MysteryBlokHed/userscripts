@@ -12,6 +12,16 @@
 ;(() => {
   const { xhrPromise } = GreaseTools
 
+  /** Names of supported sites */
+  type SiteName = 'ometv'
+
+  const domainMap: Record<string, SiteName> = {
+    'ome.tv': 'ometv',
+  }
+
+  let lastCandidateType: RTCIceCandidateType | null
+  let currentIp: string = 'Not Found'
+
   interface IpInfo {
     ip: string
     country?: string
@@ -20,18 +30,56 @@
     org?: string
   }
 
+  /** Per-site logic to get the IP and add it to the page */
+  interface Site {
+    /**
+     * Given an RTCIceCandidate, should return either the IP address of the target
+     * if the provided candidate has it, or null if the candidate does not
+     * @param candidate Some ICE candidate for an RTCPeerConnection
+     */
+    getIp(candidate: RTCIceCandidate | RTCIceCandidateInit): string | null
+    /**
+     * Should return an element to add IP address information to, if possible.
+     * It's safe to assume that this will only even be called after `getIp`
+     */
+    getMessageElement(): HTMLElement
+
+    // Allows for any relevant information for a site to be stored
+    [key: string | number | symbol]: any
+  }
+
+  const Sites: Record<SiteName, Site> = {
+    ometv: {
+      getIp(candidate: RTCIceCandidate) {
+        if (candidate.type === 'relay' && lastCandidateType !== 'relay')
+          return candidate.address
+        return null
+      },
+
+      getMessageElement() {
+        const chat = document.querySelector('.message.system') as HTMLElement
+
+        const messageContainer = document.createElement('div')
+        messageContainer.className = 'message in'
+        messageContainer.style.textAlign = 'center'
+        const message = document.createElement('span')
+
+        messageContainer.appendChild(message)
+        chat.prepend(messageContainer)
+        return message
+      },
+    },
+  } as const
+
   /**
    * Get the active site
    * @returns The active site
    * @throws {Error} Thrown if an unsupported site is visited
    */
-  const getSite = () => {
-    switch (location.hostname) {
-      case 'ome.tv':
-        return 'ometv' as const
-      default:
-        throw new Error('Activated on unsupported site')
-    }
+  const getSite = (): SiteName => {
+    const site = domainMap[location.hostname]
+    if (!site) throw new Error('Activated on unsupported site')
+    return site
   }
 
   /** The active site */
@@ -42,9 +90,6 @@
     console.groupCollapsed(...data)
     console.groupEnd()
   }
-
-  let lastCandidateType: RTCIceCandidateType | null
-  let currentIp: string = 'Not Found'
 
   /** Look up ip info */
   const findIpInfo = async (ip: string): Promise<IpInfo> =>
@@ -72,38 +117,13 @@
     org = 'Not Found'
   ) => {
     /** The element to add the IP info to */
-    const message = (() => {
-      switch (site) {
-        case 'ometv':
-          const chat = document.querySelector('.message.system')
-          if (!chat) return
-
-          const messageContainer = document.createElement('div')
-          messageContainer.className = 'message in'
-          messageContainer.style.textAlign = 'center'
-          const message = document.createElement('span')
-
-          messageContainer.appendChild(message)
-          chat.prepend(messageContainer)
-          return message
-      }
-    })() as HTMLElement
+    const message = Sites[site].getMessageElement()
 
     message.innerText = `Relay IP: ${ip}
     Country: ${country}
     Region: ${region}
     City: ${city}
     Org: ${org}\n`
-  }
-
-  const targetIp = (candidate: RTCIceCandidate): string | null => {
-    switch (site) {
-      case 'ometv':
-        if (candidate.type === 'relay' && lastCandidateType !== 'relay')
-          return candidate.address
-        break
-    }
-    return null
   }
 
   /**
@@ -121,7 +141,7 @@
       groupLog('Related:\t', candidate.relatedAddress)
       console.groupEnd()
 
-      const ip = targetIp(candidate)
+      const ip = Sites[site].getIp(candidate)
       if (ip) {
         currentIp = ip
         groupLog('IP FOUND:', currentIp)

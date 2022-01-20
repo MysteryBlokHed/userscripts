@@ -11,13 +11,47 @@
 /// <reference types="greasetools" />
 ;(() => {
   const { xhrPromise } = GreaseTools
-  /** OmeTV hijacks most logging functions, but they forgot about groups for some reason */
+  const domainMap = {
+    'ome.tv': 'ometv',
+  }
+  let lastCandidateType
+  let currentIp = 'Not Found'
+  const Sites = {
+    ometv: {
+      getIp(candidate) {
+        if (candidate.type === 'relay' && lastCandidateType !== 'relay')
+          return candidate.address
+        return null
+      },
+      getMessageElement() {
+        const chat = document.querySelector('.message.system')
+        const messageContainer = document.createElement('div')
+        messageContainer.className = 'message in'
+        messageContainer.style.textAlign = 'center'
+        const message = document.createElement('span')
+        messageContainer.appendChild(message)
+        chat.prepend(messageContainer)
+        return message
+      },
+    },
+  }
+  /**
+   * Get the active site
+   * @returns The active site
+   * @throws {Error} Thrown if an unsupported site is visited
+   */
+  const getSite = () => {
+    const site = domainMap[location.hostname]
+    if (!site) throw new Error('Activated on unsupported site')
+    return site
+  }
+  /** The active site */
+  const site = getSite()
+  /** Some sites hijack most logging functions, but they tend to forget about groups */
   const groupLog = (...data) => {
     console.groupCollapsed(...data)
     console.groupEnd()
   }
-  let lastCandidateType
-  let currentIp = 'Not Found'
   /** Look up ip info */
   const findIpInfo = async ip =>
     new Promise(resolve => {
@@ -42,19 +76,13 @@
     city = 'Not Found',
     org = 'Not Found'
   ) => {
-    const chat = document.querySelector('.message.system')
-    if (!chat) return
-    const messageContainer = document.createElement('div')
-    messageContainer.className = 'message in'
-    messageContainer.style.textAlign = 'center'
-    const message = document.createElement('span')
+    /** The element to add the IP info to */
+    const message = Sites[site].getMessageElement()
     message.innerText = `Relay IP: ${ip}
-Country: ${country}
-Region: ${region}
-City: ${city}
-Org: ${org}\n`
-    messageContainer.appendChild(message)
-    chat.prepend(messageContainer)
+    Country: ${country}
+    Region: ${region}
+    City: ${city}
+    Org: ${org}\n`
   }
   /**
    * Proxy handler for the RTCPeerConnection.prototype.addIceCandidate function
@@ -67,15 +95,16 @@ Org: ${org}\n`
       groupLog('Address:\t', candidate.address)
       groupLog('Related:\t', candidate.relatedAddress)
       console.groupEnd()
-      if (candidate.type === 'relay' && lastCandidateType !== 'relay') {
-        currentIp = candidate.address ?? 'Not Found'
+      const ip = Sites[site].getIp(candidate)
+      if (ip) {
+        currentIp = ip
         groupLog('IP FOUND:', currentIp)
         findIpInfo(currentIp).then(info => {
           groupLog('IP INFO:', info)
           addIpInfo(info.ip, info.country, info.region, info.city, info.org)
         })
       }
-      lastCandidateType = candidate.type
+      if (candidate.type) lastCandidateType = candidate.type
       return Reflect.apply(target, thisArg, args)
     },
   }
