@@ -5,6 +5,7 @@
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.ome.tv/*
+// @match       *://*.omegle.com/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
@@ -13,6 +14,7 @@
   const { xhrPromise } = GreaseTools
 
   const SiteMap = {
+    'www.omegle.com': 'omegle',
     'ome.tv': 'ometv',
   } as const
 
@@ -51,6 +53,29 @@
   }
 
   const Sites: Record<SiteName, Site> = {
+    // TODO: Verify that this actually works
+    // I'm IP banned from Omegle so I'm writing this from what I vaguely remember working last time
+    omegle: {
+      getIp(candidate: RTCIceCandidateInit) {
+        if (!candidate.candidate || !candidate.candidate.includes('typ srflx'))
+          return null
+
+        const addresses = candidate.candidate.match(
+          /\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/g
+        )
+
+        return addresses ? addresses[1] ?? null : null
+      },
+
+      addIpInfo(message) {
+        const chatbox = document.querySelector(
+          '.logbox > .logitem.info'
+        ) as HTMLElement | null
+        if (!chatbox) return
+        chatbox.innerText = message
+      },
+    },
+
     ometv: {
       lastCandidateType: 'relay',
 
