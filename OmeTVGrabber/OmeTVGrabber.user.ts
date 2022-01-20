@@ -6,7 +6,7 @@
 // @license     GPL-3.0
 // @match       *://*.ome.tv/*
 // @grant       GM.xmlHttpRequest
-// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/df110500/greasetools.user.js
+// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
 /// <reference types="greasetools" />
 ;(() => {
