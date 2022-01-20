@@ -15,11 +15,10 @@
   /** Names of supported sites */
   type SiteName = 'ometv'
 
-  const domainMap: Record<string, SiteName> = {
+  const siteMap: Record<string, SiteName> = {
     'ome.tv': 'ometv',
   }
 
-  let lastCandidateType: RTCIceCandidateType | null
   let currentIp: string = 'Not Found'
 
   interface IpInfo {
@@ -43,14 +42,20 @@
      * It's safe to assume that this will only even be called after `getIp`
      */
     getMessageElement(): HTMLElement
+  }
 
-    // Allows for any relevant information for a site to be stored
-    [key: string | number | symbol]: any
+  interface LastCandidateSite extends Site {
+    /** The type of the last ICE candidate to be connected to */
+    lastCandidateType: RTCIceCandidateType | null
   }
 
   const Sites: Record<SiteName, Site> = {
     ometv: {
+      lastCandidateType: 'relay',
       getIp(candidate: RTCIceCandidate) {
+        const lastCandidateType = this.lastCandidateType
+        this.lastCandidateType = candidate.type
+
         if (candidate.type === 'relay' && lastCandidateType !== 'relay')
           return candidate.address
         return null
@@ -68,7 +73,7 @@
         chat.prepend(messageContainer)
         return message
       },
-    },
+    } as LastCandidateSite,
   } as const
 
   /**
@@ -77,7 +82,7 @@
    * @throws {Error} Thrown if an unsupported site is visited
    */
   const getSite = (): SiteName => {
-    const site = domainMap[location.hostname]
+    const site = siteMap[location.hostname]
     if (!site) throw new Error('Activated on unsupported site')
     return site
   }
@@ -151,7 +156,6 @@
         })
       }
 
-      if (candidate.type) lastCandidateType = candidate.type
       return Reflect.apply(target, thisArg, args)
     },
   }
