@@ -11,7 +11,7 @@
 /// <reference types="greasetools" />
 ;(() => {
   const { xhrPromise } = GreaseTools
-  const siteMap = {
+  const SiteMap = {
     'ome.tv': 'ometv',
   }
   let currentIp = 'Not Found'
@@ -44,9 +44,8 @@
    * @throws {Error} Thrown if an unsupported site is visited
    */
   const getSite = () => {
-    const site = siteMap[location.hostname]
-    if (!site) throw new Error('Activated on unsupported site')
-    return site
+    if (location.hostname in SiteMap) return SiteMap[location.hostname]
+    throw new Error('Activated on unsupported site')
   }
   /** The active site */
   const site = getSite()

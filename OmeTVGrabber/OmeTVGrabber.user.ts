@@ -12,12 +12,12 @@
 ;(() => {
   const { xhrPromise } = GreaseTools
 
-  /** Names of supported sites */
-  type SiteName = 'ometv'
-
-  const siteMap: Record<string, SiteName> = {
+  const SiteMap = {
     'ome.tv': 'ometv',
-  }
+  } as const
+
+  type SiteLocation = keyof typeof SiteMap
+  type SiteName = typeof SiteMap[SiteLocation]
 
   let currentIp: string = 'Not Found'
 
@@ -85,9 +85,9 @@
    * @throws {Error} Thrown if an unsupported site is visited
    */
   const getSite = (): SiteName => {
-    const site = siteMap[location.hostname]
-    if (!site) throw new Error('Activated on unsupported site')
-    return site
+    if (location.hostname in SiteMap)
+      return SiteMap[location.hostname as SiteLocation]
+    throw new Error('Activated on unsupported site')
   }
 
   /** The active site */
