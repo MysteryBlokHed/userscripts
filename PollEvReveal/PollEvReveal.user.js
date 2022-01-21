@@ -22,7 +22,7 @@
       if (mutation.type === 'childList') {
         // If the participant element was removed, add it back
         const removedEl = Array.from(mutation.removedNodes).find(
-          el => el.className === 'component-response-qa__result'
+          el => el.className === 'component-response-qa__result',
         )
         console.log(removedEl)
         if (removedEl) mutation.target.appendChild(removedEl)

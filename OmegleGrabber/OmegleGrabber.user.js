@@ -25,7 +25,7 @@
     if (!candidate.candidate || !candidate.candidate.includes('typ srflx'))
       return null
     const addresses = candidate.candidate.match(
-      /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g
+      /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g,
     )
     return addresses ? addresses[0] ?? null : null
   }
@@ -127,7 +127,7 @@
     country = 'Not Found',
     region = 'Not Found',
     city = 'Not Found',
-    org = 'Not Found'
+    org = 'Not Found',
   ) => {
     Sites[site].addIpInfo(`\
 Relay IP: ${ip}
@@ -172,10 +172,10 @@ Org: ${org}\n`)
   }
   RTCPeerConnection.prototype.addIceCandidate = new Proxy(
     RTCPeerConnection.prototype.addIceCandidate,
-    addIceCandidateHandler
+    addIceCandidateHandler,
   )
   RTCPeerConnection.prototype.close = new Proxy(
     RTCPeerConnection.prototype.close,
-    closeHandler
+    closeHandler,
   )
 })()

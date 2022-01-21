@@ -69,7 +69,7 @@
       return null
 
     const addresses = candidate.candidate.match(
-      /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g
+      /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g,
     )
 
     return addresses ? addresses[0] ?? null : null
@@ -83,7 +83,7 @@
 
       addIpInfo(message) {
         const chatbox = document.querySelector(
-          '.logbox > .logitem'
+          '.logbox > .logitem',
         ) as HTMLElement | null
         if (!chatbox) return
         chatbox.innerText = message
@@ -122,7 +122,7 @@
 
       addIpInfo(message) {
         const chatbox = document.querySelector(
-          '#message-section'
+          '#message-section',
         ) as HTMLElement | null
         if (!chatbox) return
 
@@ -139,7 +139,7 @@
       addIpInfo(message) {
         if (!this.ipInfoEl) {
           const chatbox = document.querySelector(
-            '#messages'
+            '#messages',
           ) as HTMLElement | null
           if (!chatbox) return
 
@@ -200,7 +200,7 @@
     country = 'Not Found',
     region = 'Not Found',
     city = 'Not Found',
-    org = 'Not Found'
+    org = 'Not Found',
   ) => {
     Sites[site].addIpInfo(`\
 Relay IP: ${ip}
@@ -257,11 +257,11 @@ Org: ${org}\n`)
 
   RTCPeerConnection.prototype.addIceCandidate = new Proxy(
     RTCPeerConnection.prototype.addIceCandidate,
-    addIceCandidateHandler
+    addIceCandidateHandler,
   )
 
   RTCPeerConnection.prototype.close = new Proxy(
     RTCPeerConnection.prototype.close,
-    closeHandler
+    closeHandler,
   )
 })()
