@@ -83,7 +83,7 @@
 
       addIpInfo(message) {
         const chatbox = document.querySelector(
-          '.logbox > .logitem.info'
+          '.logbox > .logitem'
         ) as HTMLElement | null
         if (!chatbox) return
         chatbox.innerText = message

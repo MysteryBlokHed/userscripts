@@ -35,7 +35,7 @@
     omegle: {
       getIp: srflxIp,
       addIpInfo(message) {
-        const chatbox = document.querySelector('.logbox > .logitem.info')
+        const chatbox = document.querySelector('.logbox > .logitem')
         if (!chatbox) return
         chatbox.innerText = message
       },
