@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.2.0
+// @version     0.3.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.omegle.com/*
