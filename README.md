@@ -5,11 +5,18 @@ GreaseMonkey UserScripts I've written.
 ## Installing scripts
 
 To install a script, go to the folder of the script you want and select the file ending in `.user.js`.
-Then, press the button to open it in a new tab. It should be the middle button of these three:
 
-![Preview of Buttons](file_buttons.png)
+### Directly from GitLab
 
-With a UserScript extension installed, pressing this should prompt you to install it.
+Press the button in the middle of these three at the top-right of the file contents:
+
+![Preview of Buttons](img/gitlab_buttons.png)
+
+### Directly from GitHub
+
+Pres the "Raw" button at the top-right of the file contents:
+
+![Preview of Buttons](img/github_buttons.png)
 
 ## Building (Only needed for development)
 
