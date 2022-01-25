@@ -127,9 +127,6 @@
   // If the Wordle is already done, don't do anything
   if (wasCorrect()) return console.log('Word already found')
   let attempts = 1
-  // Use 'adieu' as the first word since there are 4 vowels
-  submitGuess('adieu')
-  if (wasCorrect()) return console.log('Word found: adieu')
   /** Loop to guess words */
   const guess = () => {
     if (attempts > 6) throw new Error('Could not find word')
@@ -151,5 +148,24 @@
     attempts++
     setTimeout(() => guess(), 3000)
   }
-  guess()
+  // Button to activate the script
+  const keyboard = gameRoot
+    .querySelector('game-keyboard')
+    ?.shadowRoot?.querySelector('#keyboard')
+  if (!keyboard) return
+  const buttonRow = document.createElement('div')
+  buttonRow.className = 'row'
+  const button = document.createElement('button')
+  button.innerText = 'Cheat'
+  button.setAttribute('data-state', 'correct')
+  button.onclick = () => {
+    // Use 'adieu' as the first word since there are 4 vowels
+    submitGuess('adieu')
+    if (wasCorrect()) return console.log('Word found: adieu')
+    guess()
+    button.setAttribute('data-state', 'absent')
+    button.disabled = true
+  }
+  buttonRow.appendChild(button)
+  keyboard.prepend(buttonRow)
 })()
