@@ -69,10 +69,14 @@
       press('Backspace')
   }
 
-  /** Submit a guess */
+  /**
+   * Submit a guess
+   * @throws {Error} Thrown if a guess is not 5 characters
+   */
   const submitGuess = (guess: string) => {
     clearGuess()
-    if (guess.length !== 5) console.log('<5 character guess attempted')
+    if (guess.length !== 5)
+      throw new Error('Guess attempted with word that is not 5 characters')
     for (const char of guess) press(char)
     press('Enter')
   }
@@ -98,13 +102,9 @@
 
   /** Update the unused, misplaced, and correct letters based on the last word */
   const updateLetters = () => {
-    console.log('Updating letters')
-    console.log('Last row:', lastRow())
     lastRow()
       ?.querySelectorAll('game-tile[evaluation]')
       .forEach((el, i) => {
-        console.log('el,i:', el, i)
-
         // Get the result of each tile
         const evaluation = el.getAttribute('evaluation')!
         // Tile is not present in word
@@ -117,10 +117,6 @@
         else if (evaluation === 'correct')
           correctLetters.push([el.getAttribute('letter') ?? '', i])
       })
-
-    console.log('Unused letters:', unusedLetters)
-    console.log('Misplaced letters:', misplacedLetters)
-    console.log('Correct letters:', correctLetters)
   }
 
   /** Get a regular expression to match dictionary words with */
@@ -148,8 +144,6 @@
 
       regexp += `[${letters}]`
     }
-
-    console.log('Expression for word:', regexp)
 
     return new RegExp(`^${regexp}$`, 'i')
   }
