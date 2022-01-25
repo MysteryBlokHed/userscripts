@@ -5,7 +5,7 @@
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
-// @resource    wordList https://gist.githubusercontent.com/MysteryBlokHed/0adc3a53f8e801d513a6f64eabbcb9e7/raw/f3ce36148c8a92200b82deb14399424d67889211/a
+// @resource    wordList https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt
 // @grant       GM.getResourceUrl
 // ==/UserScript==
 ;(async () => {
@@ -34,7 +34,7 @@
       )
     : await new Promise<string[]>(resolve => {
         fetch(
-          'https://gist.githubusercontent.com/MysteryBlokHed/0adc3a53f8e801d513a6f64eabbcb9e7/raw/f3ce36148c8a92200b82deb14399424d67889211/a',
+          'https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt',
         ).then(result => result.text().then(text => resolve(text.split('\n'))))
       })
 
