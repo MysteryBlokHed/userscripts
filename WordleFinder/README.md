@@ -4,7 +4,8 @@ Automatically try to find words on [Wordle](https://www.powerlanguage.co.uk/word
 
 ## Use
 
-Currently, the script activates as soon as you visit the website.
+A button labelled "Cheat" should be available above the keyboard.
+Click it at any time to start.
 
 ## How it works
 
