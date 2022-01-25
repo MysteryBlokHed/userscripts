@@ -71,7 +71,7 @@
     const rows = Array.from(gameRoot.querySelectorAll('game-row[letters]'))
     return rows
       .filter(row => row.shadowRoot?.querySelector('game-tile[evaluation]'))
-      .map(el => el.shadowRoot)
+      .map(row => row.shadowRoot)
   }
   /** Get the last submitted row */
   const lastRow = () => {
@@ -82,11 +82,13 @@
   /** Check if the last guess was correct */
   const wasCorrect = () =>
     lastRow()?.querySelectorAll('game-tile[evaluation=correct]').length === 5
-  /** Update the unused, misplaced, and correct letters based on the last word */
+  /** Update the unused, misplaced, and correct letters based on all past words */
   const updateLetters = () => {
-    lastRow()
-      ?.querySelectorAll('game-tile[evaluation]')
-      .forEach((el, i) => {
+    unusedLetters.length = 0
+    misplacedLetters.length = 0
+    correctLetters.length = 0
+    finishedRows()?.forEach(row =>
+      row?.querySelectorAll('game-tile[evaluation]').forEach((el, i) => {
         // Get the result of each tile
         const evaluation = el.getAttribute('evaluation')
         // Tile is not present in word
@@ -98,7 +100,8 @@
         // Tile is in the right place
         else if (evaluation === 'correct')
           correctLetters.push([el.getAttribute('letter') ?? '', i])
-      })
+      }),
+    )
   }
   /** Get a regular expression to match dictionary words with */
   const dictRegex = () => {
@@ -126,10 +129,11 @@
   }
   // If the Wordle is already done, don't do anything
   if (wasCorrect()) return console.log('Word already found')
-  let attempts = 1
+  let attempts = 0
   /** Loop to guess words */
   const guess = () => {
     if (attempts > 6) throw new Error('Could not find word')
+    updateLetters()
     const regex = dictRegex()
     /**
      * The next word to guess.
@@ -144,7 +148,6 @@
     if (!nextWord) throw new Error('No matching words left in dictionary')
     submitGuess(nextWord)
     if (wasCorrect()) return console.log('Word found:', nextWord)
-    updateLetters()
     attempts++
     setTimeout(() => guess(), 3000)
   }
@@ -159,9 +162,14 @@
   button.innerText = 'Cheat'
   button.setAttribute('data-state', 'correct')
   button.onclick = () => {
-    // Use 'adieu' as the first word since there are 4 vowels
-    submitGuess('adieu')
-    if (wasCorrect()) return console.log('Word found: adieu')
+    attempts = finishedRows().length + 1
+    // If the player hasn't guessed anything else yet
+    if (attempts === 1) {
+      console.log('1 attempt')
+      // Use 'adieu' as the first word since there are 4 vowels
+      submitGuess('adieu')
+      if (wasCorrect()) return console.log('Word found: adieu')
+    }
     guess()
     button.setAttribute('data-state', 'absent')
     button.disabled = true
