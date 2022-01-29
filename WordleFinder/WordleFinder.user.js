@@ -1,14 +1,18 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.1.0
+// @version     0.1.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
+// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // @resource    wordList https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt
 // @grant       GM.getResourceUrl
+// @grant       GM.xmlHttpRequest
 // ==/UserScript==
+/// <reference types="greasetools" />
 ;(async () => {
+  const { xhrPromise } = GreaseTools
   /** A custom event used to fake key presses */
   class GameKeyPressEvent extends Event {
     constructor(type, key, eventInitDict) {
@@ -26,9 +30,10 @@
         ),
       )
     : await new Promise(resolve => {
-        fetch(
-          'https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt',
-        ).then(result => result.text().then(text => resolve(text.split('\n'))))
+        xhrPromise({
+          method: 'GET',
+          url: 'https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt',
+        }).then(result => resolve(result.responseText.split('\n')))
       })
   const unusedLetters = []
   const misplacedLetters = []
