@@ -195,6 +195,13 @@
     ?.shadowRoot?.querySelector('#keyboard')
   if (!keyboard) return
 
+  // Stop button from pushing the keyboard offscreen
+  const styleSheet = (keyboard.parentNode as ShadowRoot).styleSheets[0]
+  const deleteIndex = (
+    Array.from(styleSheet.cssRules) as CSSStyleRule[]
+  ).findIndex(style => style.selectorText === ':host')
+  styleSheet.deleteRule(deleteIndex)
+
   const buttonRow = document.createElement('div')
   buttonRow.className = 'row'
   const button = document.createElement('button')
