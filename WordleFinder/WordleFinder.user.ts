@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.1.1
+// @version     0.2.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
@@ -28,8 +28,71 @@
     }
   }
 
+  type Evaluation = 'absent' | 'present' | 'correct'
+  type RowEvaluation =
+    | [Evaluation, Evaluation, Evaluation, Evaluation, Evaluation]
+    | null
+  type GameStatus = 'IN_PROGRESS' | 'WIN'
+
+  /** Describes the state of the game. Found encoded in localStorage under the key 'gameState' */
+  interface GameState {
+    /** A list of chosen words or empty strings for unreached rows */
+    boardState: [string, string, string, string, string]
+    /** Evaulations for each row */
+    evaluations: [
+      RowEvaluation,
+      RowEvaluation,
+      RowEvaluation,
+      RowEvaluation,
+      RowEvaluation,
+      RowEvaluation,
+    ]
+    /** Whether the game is in progress or done */
+    gameStatus: GameStatus
+    /** Whether hard mode is enabled */
+    hardMode: boolean
+    /** Timestamp for the last solve */
+    lastCompletedTs: number | null
+    /** Timestamp for the last play time */
+    lastPlayedTs: number | null
+    restoringFromLocalStorage: null
+    /** Active row number */
+    rowIndex: number
+    /** Correct word */
+    solution: string
+  }
+
+  /** Game state from `gameState` in `localStorage` */
+  const gameState = (() => {
+    const stateString = localStorage.getItem('gameState')
+    if (!stateString) throw new Error('Failed to get game state')
+    const stateObj = JSON.parse(stateString)
+
+    /** Should contain all keys from GameState object */
+    const requiredKeys = [
+      'boardState',
+      'evaluations',
+      'gameStatus',
+      'hardMode',
+      'lastCompletedTs',
+      'lastPlayedTs',
+      'restoringFromLocalStorage',
+      'rowIndex',
+      'solution',
+    ] as const
+
+    if (
+      Object.keys(stateObj).every(key =>
+        (requiredKeys as readonly string[]).includes(key),
+      )
+    )
+      return stateObj as GameState
+
+    throw new Error('Unexpected/missing keys in game state')
+  })()
+
   /** The list of possible words */
-  const wordList = GM.getResourceUrl
+  const wordList: string[] | null = GM.getResourceUrl!
     ? await new Promise<string[]>(resolve =>
         GM.getResourceUrl('wordList').then(blob =>
           fetch(blob).then(result =>
@@ -37,12 +100,14 @@
           ),
         ),
       )
-    : await new Promise<string[]>(resolve => {
+    : GM.xmlHttpRequest!
+    ? await new Promise<string[]>(resolve => {
         xhrPromise({
           method: 'GET',
           url: 'https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt',
         }).then(result => resolve(result.responseText.split('\n')))
       })
+    : null
 
   const unusedLetters: string[] = []
   const misplacedLetters: [letter: string, place: number][] = []
@@ -161,10 +226,13 @@
   // If the Wordle is already done, don't do anything
   if (wasCorrect()) return console.log('Word already found')
 
+  // Progressive solve
   let attempts = 0
 
   /** Loop to guess words */
   const guess = () => {
+    if (!wordList)
+      throw new Error('Progressive solve attempt with no word list')
     if (attempts > 6) throw new Error('Could not find word')
 
     updateLetters()
@@ -189,33 +257,53 @@
     setTimeout(() => guess(), 3000)
   }
 
-  // Button to activate the script
+  /** Keyboard element */
   const keyboard = gameRoot
     .querySelector('game-keyboard')
     ?.shadowRoot?.querySelector('#keyboard')
   if (!keyboard) return
 
+  // Stop button from pushing the keyboard offscreen
+  const styleSheet = (keyboard.parentNode as ShadowRoot).styleSheets[0]
+  const deleteIndex = (
+    Array.from(styleSheet.cssRules) as CSSStyleRule[]
+  ).findIndex(style => style.selectorText === ':host')
+  styleSheet.deleteRule(deleteIndex)
+
   const buttonRow = document.createElement('div')
   buttonRow.className = 'row'
-  const button = document.createElement('button')
-  button.innerText = 'Cheat'
-  button.setAttribute('data-state', 'correct')
-  button.onclick = () => {
-    attempts = finishedRows().length + 1
+  const progressiveButton = document.createElement('button')
+  progressiveButton.setAttribute('data-key', '←')
+  progressiveButton.innerText = 'Cheat (Progressive)'
 
-    // If the player hasn't guessed anything else yet
-    if (attempts === 1) {
-      console.log('1 attempt')
-      // Use 'adieu' as the first word since there are 4 vowels
-      submitGuess('adieu')
-      if (wasCorrect()) return console.log('Word found: adieu')
+  if (wordList) {
+    progressiveButton.setAttribute('data-state', 'correct')
+    progressiveButton.onclick = () => {
+      attempts = finishedRows().length + 1
+
+      // If the player hasn't guessed anything else yet
+      if (attempts === 1) {
+        console.log('1 attempt')
+        // Use 'crane' as the first word since 3blue1brown said so
+        submitGuess('crane')
+        if (wasCorrect()) return console.log('Word found: crane')
+      }
+
+      guess()
+      progressiveButton.setAttribute('data-state', 'absent')
+      progressiveButton.disabled = true
     }
-
-    guess()
-    button.setAttribute('data-state', 'absent')
-    button.disabled = true
+  } else {
+    progressiveButton.setAttribute('data-state', 'absent')
   }
 
-  buttonRow.appendChild(button)
+  const instantButton = document.createElement('button')
+  instantButton.setAttribute('data-key', '←')
+  instantButton.innerText = 'Cheat (Instant)'
+  instantButton.setAttribute('data-state', 'correct')
+  instantButton.onclick = () => submitGuess(gameState.solution)
+
+  buttonRow.appendChild(progressiveButton)
+  buttonRow.appendChild(instantButton)
   keyboard.prepend(buttonRow)
 })()
