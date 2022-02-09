@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.2.0
+// @version     0.2.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
@@ -12,7 +12,8 @@
 // ==/UserScript==
 /// <reference types="greasetools" />
 ;(async () => {
-  const { xhrPromise } = GreaseTools
+  const xhrPromise = window.GreaseTools?.xhrPromise
+  const GM = window.GM ?? {}
   /** A custom event used to fake key presses */
   class GameKeyPressEvent extends Event {
     constructor(type, key, eventInitDict) {
@@ -50,7 +51,7 @@
           ),
         ),
       )
-    : GM.xmlHttpRequest
+    : GM.xmlHttpRequest && xhrPromise
     ? await new Promise(resolve => {
         xhrPromise({
           method: 'GET',
