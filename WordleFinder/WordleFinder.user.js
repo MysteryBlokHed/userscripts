@@ -20,6 +20,27 @@
       this.detail = { key }
     }
   }
+  /** Game state from `gameState` in `localStorage` */
+  const gameState = (() => {
+    const stateString = localStorage.getItem('gameState')
+    if (!stateString) throw new Error('Failed to get game state')
+    const stateObj = JSON.parse(stateString)
+    /** Should contain all keys from GameState object */
+    const requiredKeys = [
+      'boardState',
+      'evaluations',
+      'gameStatus',
+      'hardMode',
+      'lastCompletedTs',
+      'lastPlayedTs',
+      'restoringFromLocalStorage',
+      'rowIndex',
+      'solution',
+    ]
+    if (Object.keys(stateObj).every(key => requiredKeys.includes(key)))
+      return stateObj
+    throw new Error('Unexpected/missing keys in game state')
+  })()
   /** The list of possible words */
   const wordList = GM.getResourceUrl
     ? await new Promise(resolve =>
@@ -28,7 +49,7 @@
             result.text().then(text => resolve(text.split('\n'))),
           ),
         ),
-      )
+      ).catch(() => null)
     : await new Promise(resolve => {
         xhrPromise({
           method: 'GET',
@@ -134,9 +155,12 @@
   }
   // If the Wordle is already done, don't do anything
   if (wasCorrect()) return console.log('Word already found')
+  // Progressive solve
   let attempts = 0
   /** Loop to guess words */
   const guess = () => {
+    if (!wordList)
+      throw new Error('Progressive solve attempt with no word list')
     if (attempts > 6) throw new Error('Could not find word')
     updateLetters()
     const regex = dictRegex()
@@ -156,7 +180,7 @@
     attempts++
     setTimeout(() => guess(), 3000)
   }
-  // Button to activate the script
+  /** Keyboard element */
   const keyboard = gameRoot
     .querySelector('game-keyboard')
     ?.shadowRoot?.querySelector('#keyboard')
@@ -169,22 +193,27 @@
   styleSheet.deleteRule(deleteIndex)
   const buttonRow = document.createElement('div')
   buttonRow.className = 'row'
-  const button = document.createElement('button')
-  button.innerText = 'Cheat'
-  button.setAttribute('data-state', 'correct')
-  button.onclick = () => {
+  const progressiveButton = document.createElement('button')
+  progressiveButton.innerText = 'Cheat (Progressive)'
+  progressiveButton.setAttribute('data-state', 'correct')
+  progressiveButton.onclick = () => {
     attempts = finishedRows().length + 1
     // If the player hasn't guessed anything else yet
     if (attempts === 1) {
       console.log('1 attempt')
-      // Use 'adieu' as the first word since there are 4 vowels
-      submitGuess('adieu')
-      if (wasCorrect()) return console.log('Word found: adieu')
+      // Use 'crane' as the first word since 3blue1brown said so
+      submitGuess('crane')
+      if (wasCorrect()) return console.log('Word found: crane')
     }
     guess()
-    button.setAttribute('data-state', 'absent')
-    button.disabled = true
+    progressiveButton.setAttribute('data-state', 'absent')
+    progressiveButton.disabled = true
   }
-  buttonRow.appendChild(button)
+  const instantButton = document.createElement('button')
+  instantButton.innerHTML = 'Cheat (Instant)'
+  instantButton.setAttribute('data-state', 'correct')
+  instantButton.onclick = () => submitGuess(gameState.solution)
+  buttonRow.appendChild(progressiveButton)
+  buttonRow.appendChild(instantButton)
   keyboard.prepend(buttonRow)
 })()
