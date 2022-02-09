@@ -13,6 +13,7 @@
 /// <reference types="greasetools" />
 ;(async () => {
   const xhrPromise = window.GreaseTools?.xhrPromise
+  const GM = window.GM ?? {}
 
   /** A custom event used to fake key presses */
   class GameKeyPressEvent extends Event {
@@ -92,7 +93,7 @@
   })()
 
   /** The list of possible words */
-  const wordList: string[] | null = GM?.getResourceUrl!
+  const wordList: string[] | null = GM.getResourceUrl!
     ? await new Promise<string[]>(resolve =>
         GM.getResourceUrl('wordList').then(blob =>
           fetch(blob).then(result =>
@@ -100,7 +101,7 @@
           ),
         ),
       )
-    : GM?.xmlHttpRequest! && xhrPromise!
+    : GM.xmlHttpRequest! && xhrPromise!
     ? await new Promise<string[]>(resolve => {
         xhrPromise({
           method: 'GET',
