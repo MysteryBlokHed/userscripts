@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.2.0
+// @version     0.2.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
@@ -12,7 +12,7 @@
 // ==/UserScript==
 /// <reference types="greasetools" />
 ;(async () => {
-  const { xhrPromise } = GreaseTools
+  const xhrPromise = window.GreaseTools?.xhrPromise
 
   /** A custom event used to fake key presses */
   class GameKeyPressEvent extends Event {
@@ -92,7 +92,7 @@
   })()
 
   /** The list of possible words */
-  const wordList: string[] | null = GM.getResourceUrl!
+  const wordList: string[] | null = GM?.getResourceUrl!
     ? await new Promise<string[]>(resolve =>
         GM.getResourceUrl('wordList').then(blob =>
           fetch(blob).then(result =>
@@ -100,7 +100,7 @@
           ),
         ),
       )
-    : GM.xmlHttpRequest!
+    : GM?.xmlHttpRequest! && xhrPromise!
     ? await new Promise<string[]>(resolve => {
         xhrPromise({
           method: 'GET',
