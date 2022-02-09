@@ -92,20 +92,22 @@
   })()
 
   /** The list of possible words */
-  const wordList: string[] | null = GM.getResourceUrl
+  const wordList: string[] | null = GM.getResourceUrl!
     ? await new Promise<string[]>(resolve =>
         GM.getResourceUrl('wordList').then(blob =>
           fetch(blob).then(result =>
             result.text().then(text => resolve(text.split('\n'))),
           ),
         ),
-      ).catch(() => null)
-    : await new Promise<string[]>(resolve => {
+      )
+    : GM.xmlHttpRequest!
+    ? await new Promise<string[]>(resolve => {
         xhrPromise({
           method: 'GET',
           url: 'https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt',
         }).then(result => resolve(result.responseText.split('\n')))
       })
+    : null
 
   const unusedLetters: string[] = []
   const misplacedLetters: [letter: string, place: number][] = []
@@ -271,26 +273,33 @@
   const buttonRow = document.createElement('div')
   buttonRow.className = 'row'
   const progressiveButton = document.createElement('button')
+  progressiveButton.setAttribute('data-key', '←')
   progressiveButton.innerText = 'Cheat (Progressive)'
-  progressiveButton.setAttribute('data-state', 'correct')
-  progressiveButton.onclick = () => {
-    attempts = finishedRows().length + 1
 
-    // If the player hasn't guessed anything else yet
-    if (attempts === 1) {
-      console.log('1 attempt')
-      // Use 'crane' as the first word since 3blue1brown said so
-      submitGuess('crane')
-      if (wasCorrect()) return console.log('Word found: crane')
+  if (wordList) {
+    progressiveButton.setAttribute('data-state', 'correct')
+    progressiveButton.onclick = () => {
+      attempts = finishedRows().length + 1
+
+      // If the player hasn't guessed anything else yet
+      if (attempts === 1) {
+        console.log('1 attempt')
+        // Use 'crane' as the first word since 3blue1brown said so
+        submitGuess('crane')
+        if (wasCorrect()) return console.log('Word found: crane')
+      }
+
+      guess()
+      progressiveButton.setAttribute('data-state', 'absent')
+      progressiveButton.disabled = true
     }
-
-    guess()
+  } else {
     progressiveButton.setAttribute('data-state', 'absent')
-    progressiveButton.disabled = true
   }
 
   const instantButton = document.createElement('button')
-  instantButton.innerHTML = 'Cheat (Instant)'
+  instantButton.setAttribute('data-key', '←')
+  instantButton.innerText = 'Cheat (Instant)'
   instantButton.setAttribute('data-state', 'correct')
   instantButton.onclick = () => submitGuess(gameState.solution)
 
