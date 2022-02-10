@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.0
+// @version     0.3.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
@@ -29,7 +29,7 @@
   type RowEvaluation =
     | [Evaluation, Evaluation, Evaluation, Evaluation, Evaluation]
     | null
-  type GameStatus = 'IN_PROGRESS' | 'WIN'
+  type GameStatus = 'IN_PROGRESS' | 'WIN' | 'FAIL'
 
   /** Describes the state of the game. Found encoded in localStorage under the key 'gameState' */
   interface GameState {

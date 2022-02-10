@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.0
+// @version     0.3.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
