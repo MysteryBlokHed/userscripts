@@ -21,8 +21,7 @@
       this.detail = { key }
     }
   }
-  /** Game state from `gameState` in `localStorage` */
-  const gameState = (() => {
+  const getState = () => {
     const stateString = localStorage.getItem('gameState')
     if (!stateString) throw new Error('Failed to get game state')
     const stateObj = JSON.parse(stateString)
@@ -41,7 +40,21 @@
     if (Object.keys(stateObj).every(key => requiredKeys.includes(key)))
       return stateObj
     throw new Error('Unexpected/missing keys in game state')
-  })()
+  }
+  /** Game state that automatically modifies localStorage values on change */
+  const gameState = new Proxy(getState(), {
+    set(target, key, value, receiver) {
+      const result = Reflect.set(target, key, value, receiver)
+      localStorage.setItem('gameState', JSON.stringify(target))
+      return result
+    },
+    get(target, key, receiver) {
+      const state = localStorage.getItem('gameState')
+      if (!state) return Reflect.get(target, key, receiver)
+      target[key] = getState()[key]
+      return Reflect.get(target, key, receiver)
+    },
+  })
   /** The list of possible words */
   const wordList = GM.getResourceUrl
     ? await new Promise(resolve =>
@@ -95,42 +108,43 @@
     for (const char of guess) press(char)
     press('Enter')
   }
-  /** Get a list of finished rows' shadowRoots */
-  const finishedRows = () => {
-    const rows = Array.from(gameRoot.querySelectorAll('game-row[letters]'))
-    return rows
-      .filter(row => row.shadowRoot?.querySelector('game-tile[evaluation]'))
-      .map(row => row.shadowRoot)
+  const lettersAndEvaluations = () => {
+    const words = gameState.boardState
+    const evaluations = gameState.evaluations
+    const result = []
+    for (const [i, word] of words.entries()) {
+      if (!word || !evaluations[i]) return result
+      result.push([])
+      for (const [j, char] of word.split('').entries()) {
+        result[i].push([char, evaluations[i][j]])
+      }
+    }
+    return result
   }
-  /** Get the last submitted row */
-  const lastRow = () => {
-    const rows = finishedRows()
-    if (rows.length) return rows[rows.length - 1]
-    else return null
-  }
+  const finishedRowCount = () =>
+    gameState.boardState.filter(word => word).length + 1
   /** Check if the last guess was correct */
-  const wasCorrect = () =>
-    lastRow()?.querySelectorAll('game-tile[evaluation=correct]').length === 5
+  const wasCorrect = () => gameState.gameStatus === 'WIN'
   /** Update the unused, misplaced, and correct letters based on all past words */
   const updateLetters = () => {
     unusedLetters.length = 0
     misplacedLetters.length = 0
     correctLetters.length = 0
-    finishedRows()?.forEach(row =>
-      row?.querySelectorAll('game-tile[evaluation]').forEach((el, i) => {
-        // Get the result of each tile
-        const evaluation = el.getAttribute('evaluation')
-        // Tile is not present in word
-        if (evaluation === 'absent')
-          unusedLetters.push(el.getAttribute('letter') ?? '')
-        // Tile is in the word, but misplaced
-        else if (evaluation === 'present')
-          misplacedLetters.push([el.getAttribute('letter') ?? '', i])
-        // Tile is in the right place
-        else if (evaluation === 'correct')
-          correctLetters.push([el.getAttribute('letter') ?? '', i])
-      }),
-    )
+    for (const word of lettersAndEvaluations()) {
+      for (const [i, [char, evaluation]] of word.entries()) {
+        switch (evaluation) {
+          case 'absent':
+            unusedLetters.push(char)
+            break
+          case 'present':
+            misplacedLetters.push([char, i])
+            break
+          case 'correct':
+            correctLetters.push([char, i])
+            break
+        }
+      }
+    }
   }
   /** Get a regular expression to match dictionary words with */
   const dictRegex = () => {
@@ -202,7 +216,7 @@
   if (wordList) {
     progressiveButton.setAttribute('data-state', 'correct')
     progressiveButton.onclick = () => {
-      attempts = finishedRows().length + 1
+      attempts = finishedRowCount()
       // If the player hasn't guessed anything else yet
       if (attempts === 1) {
         console.log('1 attempt')
