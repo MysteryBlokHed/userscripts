@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.2.1
+// @version     0.3.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.powerlanguage.co.uk/wordle*
@@ -41,7 +41,10 @@
       return stateObj
     throw new Error('Unexpected/missing keys in game state')
   }
-  /** Game state that automatically modifies localStorage values on change */
+  /**
+   * Game state that automatically modifies localStorage values on change
+   * and checks localStorage values on get
+   */
   const gameState = new Proxy(getState(), {
     set(target, key, value, receiver) {
       const result = Reflect.set(target, key, value, receiver)
