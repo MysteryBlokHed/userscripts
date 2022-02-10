@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.1
+// @version     0.3.2
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
+// @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // @resource    wordList https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt
@@ -22,7 +23,7 @@
     }
   }
   const getState = () => {
-    const stateString = localStorage.getItem('gameState')
+    const stateString = localStorage.getItem('nyt-wordle-state')
     if (!stateString) throw new Error('Failed to get game state')
     const stateObj = JSON.parse(stateString)
     /** Should contain all keys from GameState object */
@@ -48,11 +49,11 @@
   const gameState = new Proxy(getState(), {
     set(target, key, value, receiver) {
       const result = Reflect.set(target, key, value, receiver)
-      localStorage.setItem('gameState', JSON.stringify(target))
+      localStorage.setItem('nyt-wordle-state', JSON.stringify(target))
       return result
     },
     get(target, key, receiver) {
-      const state = localStorage.getItem('gameState')
+      const state = localStorage.getItem('nyt-wordle-state')
       if (!state) return Reflect.get(target, key, receiver)
       target[key] = getState()[key]
       return Reflect.get(target, key, receiver)
