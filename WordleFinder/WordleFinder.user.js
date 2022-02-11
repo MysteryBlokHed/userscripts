@@ -1,20 +1,23 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.2
+// @version     0.3.3
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
+// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.1.0/ls-proxy.user.js
 // @resource    wordList https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt
 // @grant       GM.getResourceUrl
 // @grant       GM.xmlHttpRequest
+// @grant       unsafeWindow
 // ==/UserScript==
 /// <reference types="greasetools" />
+/// <reference types="ls-proxy" />
 ;(async () => {
-  const xhrPromise = window.GreaseTools?.xhrPromise
-  const GM = window.GM ?? {}
+  const { xhrPromise } = GreaseTools
+  const { storeObject } = LSProxy
   /** A custom event used to fake key presses */
   class GameKeyPressEvent extends Event {
     constructor(type, key, eventInitDict) {
@@ -22,10 +25,7 @@
       this.detail = { key }
     }
   }
-  const getState = () => {
-    const stateString = localStorage.getItem('nyt-wordle-state')
-    if (!stateString) throw new Error('Failed to get game state')
-    const stateObj = JSON.parse(stateString)
+  const validate = value => {
     /** Should contain all keys from GameState object */
     const requiredKeys = [
       'boardState',
@@ -38,27 +38,32 @@
       'rowIndex',
       'solution',
     ]
-    if (Object.keys(stateObj).every(key => requiredKeys.includes(key)))
-      return stateObj
-    throw new Error('Unexpected/missing keys in game state')
+    if (Object.keys(value).every(key => requiredKeys.includes(key))) {
+      return true
+    }
+    return false
   }
   /**
    * Game state that automatically modifies localStorage values on change
    * and checks localStorage values on get
    */
-  const gameState = new Proxy(getState(), {
-    set(target, key, value, receiver) {
-      const result = Reflect.set(target, key, value, receiver)
-      localStorage.setItem('nyt-wordle-state', JSON.stringify(target))
-      return result
+  const gameState = storeObject(
+    'nyt-wordle-state',
+    {
+      boardState: ['', '', '', '', '', ''],
+      evaluations: [null, null, null, null, null, null],
+      gameStatus: 'IN_PROGRESS',
+      hardMode: false,
+      lastCompletedTs: null,
+      lastPlayedTs: null,
+      restoringFromLocalStorage: null,
+      rowIndex: 0,
+      solution: 'crane',
     },
-    get(target, key, receiver) {
-      const state = localStorage.getItem('nyt-wordle-state')
-      if (!state) return Reflect.get(target, key, receiver)
-      target[key] = getState()[key]
-      return Reflect.get(target, key, receiver)
-    },
-  })
+    { validate },
+  )
+
+  unsafeWindow.gameState = gameState
   /** The list of possible words */
   const wordList = GM.getResourceUrl
     ? await new Promise(resolve =>

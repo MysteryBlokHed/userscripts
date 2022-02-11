@@ -454,6 +454,13 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+ls-proxy@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ls-proxy/-/ls-proxy-0.1.0.tgz#b78db4a8db0c937aea7be0b048e276ada7a34904"
+  integrity sha512-Z0+Pyx3sfAA8nO1SqhWWYya8ikurXAE0dmPguEor9Xk1Sn5K0nmu6UiMfJYMkkuRsPiCGV6p0fJlIzF5Os9LYA==
+  dependencies:
+    "@types/greasemonkey" "^4.0.2"
+
 make-dir@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-3.1.0.tgz#415e967046b3a7f1d185277d84aa58203726a13f"
