@@ -92,7 +92,7 @@
    * and checks localStorage values on get
    */
   const gameState = storeObject<keyof GameState, GameState>(
-    'nyt-wordle-state',
+    localStorage['gameState'] ? 'gameState' : 'nyt-wordle-state',
     {
       boardState: ['', '', '', '', '', ''],
       evaluations: [null, null, null, null, null, null],
