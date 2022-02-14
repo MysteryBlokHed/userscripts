@@ -102,7 +102,7 @@
       lastPlayedTs: null,
       restoringFromLocalStorage: null,
       rowIndex: 0,
-      solution: 'crane',
+      solution: 'trace',
     },
     { validate },
   )
@@ -304,9 +304,9 @@
       // If the player hasn't guessed anything else yet
       if (attempts === 1) {
         console.log('1 attempt')
-        // Use 'crane' as the first word since 3blue1brown said so
-        submitGuess('crane')
-        if (wasCorrect()) return console.log('Word found: crane')
+        // Use 'trace' as the first word since 3blue1brown said so
+        submitGuess('trace')
+        if (wasCorrect()) return console.log('Word found: trace')
       }
 
       guess()
