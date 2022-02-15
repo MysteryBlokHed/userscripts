@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.3.0
+// @version     0.3.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.omegle.com/*
@@ -35,7 +35,7 @@
     omegle: {
       getIp: srflxIp,
       addIpInfo(message) {
-        const chatbox = document.querySelector('.logbox > .logitem')
+        const chatbox = document.querySelector('.logbox .logitem')
         if (!chatbox) return
         chatbox.innerText = message
       },
