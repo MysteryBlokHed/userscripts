@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.3
+// @version     0.3.4
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
-// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.1.0/ls-proxy.user.js
+// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.2.0/ls-proxy.user.js
 // @resource    wordList https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt
 // @grant       GM.getResourceUrl
 // @grant       GM.xmlHttpRequest
@@ -16,7 +16,7 @@
 /// <reference types="ls-proxy" />
 ;(async () => {
   const { xhrPromise } = GreaseTools
-  const { storeObject } = LSProxy
+  const { storeObject, Validations } = LSProxy
 
   /** A custom event used to fake key presses */
   class GameKeyPressEvent extends Event {
@@ -62,49 +62,49 @@
     solution: string
   }
 
+  /** Keys on GameState that are used */
+  type ImportantState = Pick<
+    GameState,
+    'boardState' | 'evaluations' | 'gameStatus' | 'solution'
+  >
+
   const validate = (value: any) => {
-    /** Should contain all keys from GameState object */
     const requiredKeys = [
       'boardState',
       'evaluations',
       'gameStatus',
-      'hardMode',
-      'lastCompletedTs',
-      'lastPlayedTs',
-      'restoringFromLocalStorage',
-      'rowIndex',
       'solution',
     ] as const
 
-    if (
-      Object.keys(value).every(key =>
-        (requiredKeys as readonly string[]).includes(key),
-      )
+    if (!Validations.keys(value, requiredKeys)) {
+      return false
+    } else if (
+      !Validations.types(value, {
+        boardState: 'object',
+        evaluations: 'object',
+        gameStatus: 'string',
+        solution: 'string',
+      })
     ) {
-      return true
+      return false
     }
 
-    return false
+    return true
   }
 
   /**
    * Game state that automatically modifies localStorage values on change
    * and checks localStorage values on get
    */
-  const gameState = storeObject<keyof GameState, GameState>(
+  const gameState = storeObject<ImportantState>(
     localStorage['gameState'] ? 'gameState' : 'nyt-wordle-state',
     {
       boardState: ['', '', '', '', '', ''],
       evaluations: [null, null, null, null, null, null],
       gameStatus: 'IN_PROGRESS',
-      hardMode: false,
-      lastCompletedTs: null,
-      lastPlayedTs: null,
-      restoringFromLocalStorage: null,
-      rowIndex: 0,
       solution: 'trace',
     },
-    { validate },
+    { partial: true, validate },
   )
 
   /** The list of possible words */
