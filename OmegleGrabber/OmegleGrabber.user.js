@@ -30,8 +30,6 @@
     return addresses ? addresses[0] ?? null : null
   }
   const Sites = {
-    // TODO: Verify that this actually works
-    // I'm IP banned from Omegle so I'm writing this from what I vaguely remember working last time
     omegle: {
       getIp: srflxIp,
       addIpInfo(message) {
