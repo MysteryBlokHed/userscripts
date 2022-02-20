@@ -128,7 +128,7 @@
     org = 'Not Found',
   ) => {
     Sites[site].addIpInfo(`\
-Relay IP: ${ip}
+IP: ${ip}
 Country: ${country}
 Region: ${region}
 City: ${city}
