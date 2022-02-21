@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.4.0
+// @version     0.4.1
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.omegle.com/*
@@ -22,12 +22,17 @@
   }
   let currentIp = 'Not Found'
   const srflxIp = candidate => {
+    var _a
     if (!candidate.candidate || !candidate.candidate.includes('typ srflx'))
       return null
     const addresses = candidate.candidate.match(
       /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g,
     )
-    return addresses ? addresses[0] ?? null : null
+    return addresses
+      ? (_a = addresses[0]) !== null && _a !== void 0
+        ? _a
+        : null
+      : null
   }
   const Sites = {
     omegle: {
@@ -130,12 +135,12 @@
   const defaultInfo = ({ ip, country, region, city, org, loc, tz }) => {
     return {
       ip,
-      country: country ?? 'Not Found',
-      region: region ?? 'Not Found',
-      city: city ?? 'Not Found',
-      org: org ?? 'Not Found',
-      loc: loc ?? 'Not Found',
-      tz: tz ?? 'Not Found',
+      country: country !== null && country !== void 0 ? country : 'Not Found',
+      region: region !== null && region !== void 0 ? region : 'Not Found',
+      city: city !== null && city !== void 0 ? city : 'Not Found',
+      org: org !== null && org !== void 0 ? org : 'Not Found',
+      loc: loc !== null && loc !== void 0 ? loc : 'Not Found',
+      tz: tz !== null && tz !== void 0 ? tz : 'Not Found',
     }
   }
   const getTime = timeZone => new Date().toLocaleString('en-US', { timeZone })
@@ -181,9 +186,12 @@ Time (When First Connected): ${getTime(tz)}
    */
   const closeHandler = {
     apply(target, thisArg, args) {
+      var _a, _b
       currentIp = 'Not Found'
       // Call rtcClose if defined
-      Sites[site].rtcClose?.()
+      ;(_b = (_a = Sites[site]).rtcClose) === null || _b === void 0
+        ? void 0
+        : _b.call(_a)
       return Reflect.apply(target, thisArg, args)
     },
   }

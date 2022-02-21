@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.5
+// @version     0.3.6
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.nytimes.com/games/wordle*
@@ -15,6 +15,7 @@
 /// <reference types="greasetools" />
 /// <reference types="ls-proxy" />
 ;(async () => {
+  var _a, _b, _c
   const { xhrPromise } = GreaseTools
   const { storeObject, Validations } = LSProxy
   /** A custom event used to fake key presses */
@@ -75,7 +76,10 @@
   const misplacedLetters = []
   const correctLetters = []
   /** The shadow root with the game's elements */
-  const gameRoot = document.querySelector('game-app')?.shadowRoot
+  const gameRoot =
+    (_a = document.querySelector('game-app')) === null || _a === void 0
+      ? void 0
+      : _a.shadowRoot
   if (!gameRoot)
     throw new Error('Could not find game-app element and/or its shadow root')
   /** The div containing the game contents */
@@ -197,9 +201,13 @@
     setTimeout(() => guess(), 3000)
   }
   /** Keyboard element */
-  const keyboard = gameRoot
-    .querySelector('game-keyboard')
-    ?.shadowRoot?.querySelector('#keyboard')
+  const keyboard =
+    (_c =
+      (_b = gameRoot.querySelector('game-keyboard')) === null || _b === void 0
+        ? void 0
+        : _b.shadowRoot) === null || _c === void 0
+      ? void 0
+      : _c.querySelector('#keyboard')
   if (!keyboard) return
   // Stop button from pushing the keyboard offscreen
   const styleSheet = keyboard.parentNode.styleSheets[0]

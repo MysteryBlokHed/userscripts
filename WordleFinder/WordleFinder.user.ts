@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.5
+// @version     0.3.6
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.nytimes.com/games/wordle*
