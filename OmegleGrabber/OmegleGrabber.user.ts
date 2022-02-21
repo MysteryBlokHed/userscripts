@@ -218,11 +218,12 @@
       city: city ?? 'Not Found',
       org: org ?? 'Not Found',
       loc: loc ?? 'Not Found',
-      tz: tz
-        ? `${tz} (${new Date().toLocaleString('en-US', { timeZone: tz })})`
-        : 'Not Found',
+      tz: tz ?? 'Not Found',
     }
   }
+
+  const getTime = (timeZone?: string) =>
+    new Date().toLocaleString('en-US', { timeZone })
 
   /** Add IP info to the chatbox */
   const addIpInfo = (info: IpInfo) => {
@@ -236,6 +237,7 @@ City: ${city}
 Org: ${org}
 APPROX Coords: ${loc}
 Timezone: ${tz}
+Time (When First Connected): ${getTime(tz)}
 \n`)
   }
 
