@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.3.1
+// @version     0.4.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.omegle.com/*
@@ -33,6 +33,8 @@
     region?: string
     city?: string
     org?: string
+    loc?: string
+    tz?: string
   }
 
   /** Per-site logic to get the IP and add its info to the page */
@@ -184,7 +186,15 @@
       })
         .then(({ responseText }) => {
           const info = JSON.parse(responseText) as Record<string, string>
-          resolve({ ip, ...info })
+          resolve({
+            ip,
+            country: info.country,
+            region: info.region,
+            city: info.city,
+            org: info.org,
+            loc: info.loc,
+            tz: info.timezone,
+          })
         })
         .catch(() => {
           groupLog('Failed to get IP info from ipinfo.io')
@@ -192,20 +202,41 @@
         })
     })
 
+  const defaultInfo = ({
+    ip,
+    country,
+    region,
+    city,
+    org,
+    loc,
+    tz,
+  }: IpInfo): Required<IpInfo> => {
+    return {
+      ip,
+      country: country ?? 'Not Found',
+      region: region ?? 'Not Found',
+      city: city ?? 'Not Found',
+      org: org ?? 'Not Found',
+      loc: loc ?? 'Not Found',
+      tz: tz
+        ? `${tz} (${new Date().toLocaleString('en-US', { timeZone: tz })})`
+        : 'Not Found',
+    }
+  }
+
   /** Add IP info to the chatbox */
-  const addIpInfo = (
-    ip: string,
-    country = 'Not Found',
-    region = 'Not Found',
-    city = 'Not Found',
-    org = 'Not Found',
-  ) => {
+  const addIpInfo = (info: IpInfo) => {
+    const { ip, country, region, city, org, loc, tz } = defaultInfo(info)
+
     Sites[site].addIpInfo(`\
 IP: ${ip}
 Country: ${country}
 Region: ${region}
 City: ${city}
-Org: ${org}\n`)
+Org: ${org}
+APPROX Coords: ${loc}
+Timezone: ${tz}
+\n`)
   }
 
   /**
@@ -229,7 +260,7 @@ Org: ${org}\n`)
         groupLog('IP FOUND:', currentIp)
         findIpInfo(currentIp).then(info => {
           groupLog('IP INFO:', info)
-          addIpInfo(info.ip, info.country, info.region, info.city, info.org)
+          addIpInfo(info)
         })
       }
 
