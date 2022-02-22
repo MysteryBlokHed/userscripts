@@ -8,6 +8,7 @@
 // @match       *://*.ome.tv/*
 // @match       *://*.chathub.cam/*
 // @match       *://*.emeraldchat.com/*
+// @match       *://*.strangercam.com/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
@@ -20,6 +21,8 @@
     'ome.tv': 'ometv',
     'chathub.cam': 'chathub',
     'www.emeraldchat.com': 'emeraldchat',
+    'strangercam.com': 'strangercam',
+    'app.strangercam.com': 'strangercam',
   } as const
 
   type SiteLocation = keyof typeof SiteMap
@@ -155,6 +158,28 @@
         this.addIpInfo(currentIp)
       },
     } as IpElSite,
+
+    strangercam: {
+      getIp: srflxIp,
+
+      addIpInfo(message) {
+        const chatBody = document.querySelector(
+          '.chat-body',
+        ) as HTMLElement | null
+        if (!chatBody) return
+
+        const remoteChat = document.createElement('div')
+        remoteChat.className = 'remote-chat'
+        const container = document.createElement('div')
+        const ipInfo = document.createElement('span')
+        ipInfo.className = 'server-msg'
+        ipInfo.innerText = message
+
+        container.appendChild(ipInfo)
+        remoteChat.appendChild(container)
+        chatBody.prepend(remoteChat)
+      },
+    },
   }
 
   /**
@@ -165,7 +190,7 @@
   const getSite = (): SiteName => {
     if (location.hostname in SiteMap)
       return SiteMap[location.hostname as SiteLocation]
-    throw new Error('Activated on unsupported site')
+    throw new Error(`Activated on unsupported site (${location.hostname})`)
   }
 
   /** The active site */
