@@ -9,6 +9,7 @@
 // @match       *://*.chathub.cam/*
 // @match       *://*.emeraldchat.com/*
 // @match       *://*.strangercam.com/*
+// @match       *://*.allotalk.com/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
@@ -21,8 +22,9 @@
     'ome.tv': 'ometv',
     'chathub.cam': 'chathub',
     'www.emeraldchat.com': 'emeraldchat',
-    'strangercam.com': 'strangercam',
-    'app.strangercam.com': 'strangercam',
+    'strangercam.com': 'strangerOrAllo',
+    'app.strangercam.com': 'strangerOrAllo',
+    'randomchat.allotalk.com': 'strangerOrAllo',
   } as const
 
   type SiteLocation = keyof typeof SiteMap
@@ -159,7 +161,7 @@
       },
     } as IpElSite,
 
-    strangercam: {
+    strangerOrAllo: {
       getIp: srflxIp,
 
       addIpInfo(message) {

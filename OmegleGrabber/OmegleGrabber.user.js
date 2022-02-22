@@ -9,6 +9,7 @@
 // @match       *://*.chathub.cam/*
 // @match       *://*.emeraldchat.com/*
 // @match       *://*.strangercam.com/*
+// @match       *://*.allotalk.com/*
 // @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
 // ==/UserScript==
@@ -20,8 +21,9 @@
     'ome.tv': 'ometv',
     'chathub.cam': 'chathub',
     'www.emeraldchat.com': 'emeraldchat',
-    'strangercam.com': 'strangercam',
-    'app.strangercam.com': 'strangercam',
+    'strangercam.com': 'strangerOrAllo',
+    'app.strangercam.com': 'strangerOrAllo',
+    'randomchat.allotalk.com': 'strangerOrAllo',
   }
   let currentIp = 'Not Found'
   const srflxIp = candidate => {
@@ -94,7 +96,7 @@
         this.addIpInfo(currentIp)
       },
     },
-    strangercam: {
+    strangerOrAllo: {
       getIp: srflxIp,
       addIpInfo(message) {
         const chatBody = document.querySelector('.chat-body')
