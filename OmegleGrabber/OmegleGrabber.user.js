@@ -8,6 +8,7 @@
 // @match       *://*.ome.tv/*
 // @match       *://*.chathub.cam/*
 // @match       *://*.emeraldchat.com/*
+// @match       *://*.camsurf.com/*
 // @match       *://*.strangercam.com/*
 // @match       *://*.allotalk.com/*
 // @grant       GM.xmlHttpRequest
@@ -21,6 +22,7 @@
     'ome.tv': 'ometv',
     'chathub.cam': 'chathub',
     'www.emeraldchat.com': 'emeraldchat',
+    'camsurf.com': 'camsurf',
     'strangercam.com': 'strangerOrAllo',
     'app.strangercam.com': 'strangerOrAllo',
     'randomchat.allotalk.com': 'strangerOrAllo',
@@ -94,6 +96,15 @@
       },
       rtcClose() {
         this.addIpInfo(currentIp)
+      },
+    },
+    camsurf: {
+      getIp: srflxIp,
+      addIpInfo(message) {
+        const chatbox = document.querySelector('.rv_head.chat-ava > p')
+        console.log(chatbox)
+        if (!chatbox) return
+        chatbox.innerText = message
       },
     },
     strangerOrAllo: {
