@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.4.1
+// @version     0.4.2
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
 // @match       *://*.omegle.com/*
@@ -9,7 +9,7 @@
 // @match       *://*.chathub.cam/*
 // @match       *://*.emeraldchat.com/*
 // @grant       GM.xmlHttpRequest
-// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.4.0/greasetools.user.js
+// @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.5.0/greasetools.user.js
 // ==/UserScript==
 /// <reference types="greasetools" />
 ;(() => {
