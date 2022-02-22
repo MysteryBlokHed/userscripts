@@ -5,6 +5,7 @@
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
+// @copyright   2022 Adam Thomspon-Sharpe
 // @match       *://*.omegle.com/*
 // @match       *://*.ome.tv/*
 // @match       *://*.chathub.cam/*
@@ -12,8 +13,8 @@
 // @match       *://*.camsurf.com/*
 // @match       *://*.strangercam.com/*
 // @match       *://*.allotalk.com/*
-// @grant       GM.xmlHttpRequest
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.5.0/greasetools.user.js
+// @grant       GM.xmlHttpRequest
 // ==/UserScript==
 /// <reference types="greasetools" />
 ;(() => {

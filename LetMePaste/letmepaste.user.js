@@ -5,6 +5,7 @@
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
+// @copyright   2022 Adam Thomspon-Sharpe
 // @match       <all_urls>
 // @grant       none
 // ==/UserScript==
