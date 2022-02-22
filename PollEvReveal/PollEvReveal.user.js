@@ -3,6 +3,7 @@
 // @description Show the names of people who submitted answers on Poll Everywhere
 // @version     0.1.0
 // @author      Adam Thompson-Sharpe
+// @namespace   MysteryBlokHed
 // @license     GPL-3.0
 // @match       *://*.pollev.com/*
 // ==/UserScript==

@@ -3,6 +3,7 @@
 // @description Find words on Wordle
 // @version     0.3.7
 // @author      Adam Thompson-Sharpe
+// @namespace   MysteryBlokHed
 // @license     GPL-3.0
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*

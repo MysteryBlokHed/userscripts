@@ -3,6 +3,7 @@
 // @description Get IP addresses on multiple video chat sites
 // @version     0.5.0
 // @author      Adam Thompson-Sharpe
+// @namespace   MysteryBlokHed
 // @license     GPL-3.0
 // @match       *://*.omegle.com/*
 // @match       *://*.ome.tv/*

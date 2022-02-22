@@ -3,6 +3,7 @@
 // @description Enables pasting on input boxes where it was disabled.
 // @version     0.1.0
 // @author      Adam Thompson-Sharpe
+// @namespace   MysteryBlokHed
 // @license     GPL-3.0
 // @match       <all_urls>
 // @grant       none
