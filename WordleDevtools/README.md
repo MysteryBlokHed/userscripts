@@ -32,3 +32,4 @@ Available functions/objects:
 | press      | function | Simulate a keypress. The passed key should be a string such as `'a'` or `'Backspace'`                                      |
 | guess      | function | Pass a word to guess                                                                                                       |
 | undoGuess  | function | Undoes the last guess and reloads the page (required to update). Pass `false` to disable page reloading                    |
+| clearBoard | function | Clear all guesses on the board. Pass `false` to disable page reloading                                                     |

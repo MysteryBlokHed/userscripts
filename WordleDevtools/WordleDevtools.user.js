@@ -67,31 +67,21 @@
     {
       validate(value) {
         // Validate main object
-        if (
-          !Validations.keys(value, [
-            'averageGuesses',
-            'currentStreak',
-            'gamesPlayed',
-            'gamesWon',
-            'guesses',
-            'maxStreak',
-            'winPercentage',
-          ])
-        ) {
+        const mainKeys = [
+          'averageGuesses',
+          'currentStreak',
+          'gamesPlayed',
+          'gamesWon',
+          'guesses',
+          'maxStreak',
+          'winPercentage',
+        ]
+        if (!Validations.keys(value, mainKeys)) {
           return false
         }
         // Validate guesses
-        if (
-          !Validations.keys(value.guesses, [
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            'fail',
-          ])
-        ) {
+        const guessesKeys = ['1', '2', '3', '4', '5', '6', 'fail']
+        if (!Validations.keys(value.guesses, guessesKeys)) {
           return false
         }
         return true
@@ -119,6 +109,12 @@
       evaluations[row] = null
       this.gameState.gameStatus = 'IN_PROGRESS'
       this.gameState.rowIndex = row
+      if (reload) location.reload()
+    },
+    clearBoard(reload = true) {
+      const { evaluations } = this.gameState
+      const rows = evaluations.indexOf(null)
+      for (let i = 0; i < rows; i++) this.undoGuess(false)
       if (reload) location.reload()
     },
   }
