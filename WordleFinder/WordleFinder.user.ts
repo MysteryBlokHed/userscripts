@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.7
+// @version     0.3.8
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -229,15 +229,21 @@
       }
 
       let letters = 'abcdefghijklmnopqrstuvwxyz'
-      // Remove unused letters
-      unusedLetters.forEach(letter => (letters = letters.replace(letter, '')))
+      unusedLetters
+        // Filter misplaced letters that appear twice
+        .filter(
+          letter =>
+            !misplacedLetters.some(([missedLetter]) => missedLetter === letter),
+        )
+        // Remove unused letters
+        .forEach(letter => (letters = letters.replace(letter, '')))
+
       // If there are any letters not in this position, don't use them
-      const filteredMisplaced = misplacedLetters.filter(
-        ([_, place]) => place === i,
-      )
-      filteredMisplaced.forEach(
-        ([letter]) => (letters = letters.replace(letter, '')),
-      )
+      misplacedLetters
+        // Filter out letters not in this position
+        .filter(([_, place]) => place === i)
+        // Remove letters
+        .forEach(([letter]) => (letters = letters.replace(letter, '')))
 
       regexp += `[${letters}]`
     }
