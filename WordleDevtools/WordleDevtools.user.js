@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Wordle Devtools
-// @description Functions and objects to mess with wordle from the dev tools
+// @description Functions and objects to mess with Wordle from the developer console
 // @version     0.1.0
 // @author      Adam Thompson-Sharpe
 // @license     GPL-3.0
