@@ -106,24 +106,26 @@
   window.WordleDev = {
     gameState,
     statistics,
+
     press(key: string) {
       gameEl?.dispatchEvent(new WordleKeyEvent(key))
     },
+
     guess(guess: string) {
       if (guess.length !== 5) throw new Error('Invalid guess length')
       for (let i = 0; i < 5; i++) this.press('Backspace')
       for (const char of guess) this.press(char)
       this.press('Enter')
     },
-    undoGuess() {
-      const { boardState, evaluations, rowIndex } = this.gameState
-      console.log('rowindex:', rowIndex)
-      boardState[rowIndex - 1] = ''
-      console.log('boardstate:', boardState)
-      evaluations[rowIndex - 1] = null
-      console.log('evaluations:', evaluations)
+
+    undoGuess(reload = true) {
+      const { boardState, evaluations } = this.gameState
+      const row = evaluations.indexOf(null) - 1
+      boardState[row] = ''
+      evaluations[row] = null
       this.gameState.gameStatus = 'IN_PROGRESS'
-      this.gameState.rowIndex--
+      this.gameState.rowIndex = row
+      if (reload) location.reload()
     },
   }
 })()
@@ -187,7 +189,7 @@ interface WordleDev {
   /** Guess a word */
   guess(guess: string): void
   /** Undo an entered guess */
-  undoGuess(): void
+  undoGuess(reload?: boolean): void
 }
 
 declare var WordleDev: WordleDev

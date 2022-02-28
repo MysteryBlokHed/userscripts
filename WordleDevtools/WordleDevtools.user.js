@@ -112,15 +112,14 @@
       for (const char of guess) this.press(char)
       this.press('Enter')
     },
-    undoGuess() {
-      const { boardState, evaluations, rowIndex } = this.gameState
-      console.log('rowindex:', rowIndex)
-      boardState[rowIndex - 1] = ''
-      console.log('boardstate:', boardState)
-      evaluations[rowIndex - 1] = null
-      console.log('evaluations:', evaluations)
+    undoGuess(reload = true) {
+      const { boardState, evaluations } = this.gameState
+      const row = evaluations.indexOf(null) - 1
+      boardState[row] = ''
+      evaluations[row] = null
       this.gameState.gameStatus = 'IN_PROGRESS'
-      this.gameState.rowIndex--
+      this.gameState.rowIndex = row
+      if (reload) location.reload()
     },
   }
 })()
