@@ -6,21 +6,22 @@ Functions and objects to mess with Wordle from the developer console.
 
 This script will simply add some objects and functions to the global window object,
 letting you use them from the developer console. This isn't really geared towards
-being a library, but it could be used as one.
+being a library, but it could be used as one by `@require`ing the JS file.
 
 Functions and variables are on the global `WordleDev` object:
 
 ```javascript
 const { gameState, statistics } = WordleDev
 console.log(gameState.solution) // Logs the current Wordle's solution
-console.log(statistics.winPercentage) //
+console.log(statistics.winPercentage) // Logs the current win percentage
+statistics.winPercentage = 100 // Sets win percentage to 100
 ```
 
 Types can be used in TypeScript by adding
 a reference to the location of the TS source file:
 
 ```typescript
-/// <reference types="path/to/WordleDevtools.user.ts" />
+/// <reference path="path/to/WordleDevtools.user.ts" />
 ```
 
 Available functions/objects:
