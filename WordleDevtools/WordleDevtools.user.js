@@ -3,7 +3,9 @@
 // @description Functions and objects to mess with Wordle from the developer console
 // @version     0.1.0
 // @author      Adam Thompson-Sharpe
+// @namespace   MysteryBlokHed
 // @license     GPL-3.0
+// @copyright   2022 Adam Thomspon-Sharpe
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
 // @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.3.1/ls-proxy.user.js
