@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.5.0
+// @version     0.6.0
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -142,6 +142,22 @@
     console.groupCollapsed(...data)
     console.groupEnd()
   }
+  /**
+   * @param code A two-letter country code
+   * @returns A Promise that resolves with the country's full name and its flag emoji,
+   * or rejects with the message returned by the API in case of failure
+   */
+  const fullCountry = code =>
+    new Promise(async (resolve, reject) => {
+      const result = await fetch(
+        `https://restcountries.com/v3.1/alpha/${code.toUpperCase()}`,
+      )
+      const response = JSON.parse(await result.text())[0]
+      if (result.status !== 200) reject(response.text)
+      resolve(
+        `${response.name.common} ${response.flag} (${code.toUpperCase()})`,
+      )
+    })
   /** Look up ip info */
   const findIpInfo = ip =>
     new Promise(resolve => {
@@ -149,11 +165,11 @@
         method: 'GET',
         url: `https://ipinfo.io/${ip}/json`,
       })
-        .then(({ responseText }) => {
+        .then(async ({ responseText }) => {
           const info = JSON.parse(responseText)
           resolve({
             ip,
-            country: info.country,
+            country: await fullCountry(info.country).catch(() => info.country),
             region: info.region,
             city: info.city,
             org: info.org,
