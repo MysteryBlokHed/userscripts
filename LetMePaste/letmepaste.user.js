@@ -6,6 +6,8 @@
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
 // @copyright   2022 Adam Thomspon-Sharpe
+// @homepageURL https://gitlab.com/MysteryBlokHed/userscripts/-/tree/main/LetMePaste
+// @supportURL  https://gitlab.com/MysteryBlokHed/userscripts/-/issues
 // @match       <all_urls>
 // @grant       none
 // ==/UserScript==

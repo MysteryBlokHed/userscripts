@@ -6,6 +6,8 @@
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
 // @copyright   2022 Adam Thomspon-Sharpe
+// @homepageURL https://gitlab.com/MysteryBlokHed/userscripts/-/tree/main/WordleDevtools
+// @supportURL  https://gitlab.com/MysteryBlokHed/userscripts/-/issues
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
 // @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.3.1/ls-proxy.user.js
