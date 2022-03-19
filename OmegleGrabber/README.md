@@ -12,6 +12,7 @@ Get IP addresses on multiple video chat sites.
 - [StrangerCam](https://strangercam.com/)
 - [AlloTalk](https://allotalk.com/)
 
+Watermarks are automatically removed for Omegle and OmeTV.
 Currently won't work with any mode on a site that lets you talk to more than one person at a time.
 
 ## Use
