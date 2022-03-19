@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.6.0
+// @version     0.7.0
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -45,9 +45,21 @@
         : null
       : null
   }
+  const removeWhenExists = getEl => {
+    const interval = setInterval(() => {
+      const el = getEl()
+      if (el) {
+        el.remove()
+        clearInterval(interval)
+      }
+    }, 500)
+  }
   const Sites = {
     omegle: {
       getIp: srflxIp,
+      onload() {
+        removeWhenExists(() => document.querySelector('#videologo'))
+      },
       addIpInfo(message) {
         const chatbox = document.querySelector('.logbox .logitem')
         if (!chatbox) return
@@ -56,6 +68,11 @@
     },
     ometv: {
       lastCandidateType: 'relay',
+      onload() {
+        removeWhenExists(() =>
+          document.querySelector('.remote-video__watermark'),
+        )
+      },
       getIp(candidate) {
         const lastCandidateType = this.lastCandidateType
         this.lastCandidateType = candidate.type
@@ -139,6 +156,12 @@
   }
   /** The active site */
   const site = getSite()
+  window.addEventListener('load', () => {
+    var _a, _b
+    return (_b = (_a = Sites[site]).onload) === null || _b === void 0
+      ? void 0
+      : _b.call(_a)
+  })
   /** Some sites hijack most logging functions, but they tend to forget about groups */
   const groupLog = (...data) => {
     console.groupCollapsed(...data)

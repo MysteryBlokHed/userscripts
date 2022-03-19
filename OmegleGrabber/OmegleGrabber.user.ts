@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Omegle Grabber
 // @description Get IP addresses on multiple video chat sites
-// @version     0.6.0
+// @version     0.7.0
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -40,16 +40,18 @@
 
   interface IpInfo {
     ip: string
-    country?: string
-    region?: string
-    city?: string
-    org?: string
-    loc?: string
-    tz?: string
+    country?: string | undefined
+    region?: string | undefined
+    city?: string | undefined
+    org?: string | undefined
+    loc?: string | undefined
+    tz?: string | undefined
   }
 
   /** Per-site logic to get the IP and add its info to the page */
   interface Site {
+    /** Called when the site finishes loading */
+    onload?(): void
     /**
      * Given an RTCIceCandidate, should return either the IP address of the target
      * if the provided candidate has it, or null if the candidate does not
@@ -88,9 +90,23 @@
     return addresses ? addresses[0] ?? null : null
   }
 
+  const removeWhenExists = (getEl: () => Element | undefined | null) => {
+    const interval = setInterval(() => {
+      const el = getEl()
+      if (el) {
+        el.remove()
+        clearInterval(interval)
+      }
+    }, 500)
+  }
+
   const Sites: Record<SiteName, Site> = {
     omegle: {
       getIp: srflxIp,
+
+      onload() {
+        removeWhenExists(() => document.querySelector('#videologo'))
+      },
 
       addIpInfo(message) {
         const chatbox = document.querySelector(
@@ -103,6 +119,12 @@
 
     ometv: {
       lastCandidateType: 'relay',
+
+      onload() {
+        removeWhenExists(() =>
+          document.querySelector('.remote-video__watermark'),
+        )
+      },
 
       getIp(candidate: RTCIceCandidate) {
         const lastCandidateType = this.lastCandidateType
@@ -217,6 +239,8 @@
 
   /** The active site */
   const site = getSite()
+
+  window.addEventListener('load', () => Sites[site].onload?.())
 
   /** Some sites hijack most logging functions, but they tend to forget about groups */
   const groupLog = (...data: any[]) => {
