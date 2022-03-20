@@ -454,10 +454,10 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-ls-proxy@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/ls-proxy/-/ls-proxy-0.4.0.tgz#bd16b203e41e2cdf3b4833def93f0091bd7991b4"
-  integrity sha512-yRNZkenTvFry3KsCzdTijBLvEtxdq4Y8nwZmVGP1r6tR9NKKXZPqqK/5meZzLmhFyaO5URmTi6NE/GaqnP8sEQ==
+ls-proxy@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/ls-proxy/-/ls-proxy-0.5.0.tgz#68aa16e91326c8eeab20b789d6c80b439f745aa7"
+  integrity sha512-QbFDkv0eEEEalBHM7msvzxGT1sDRwRvVLvwPCc3LbOkaGX/67fa1SCjXT0jny+qpizT1LHrswQoaz/YuIPanjg==
 
 make-dir@^3.0.0:
   version "3.1.0"

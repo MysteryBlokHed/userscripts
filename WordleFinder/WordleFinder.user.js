@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Finder
 // @description Find words on Wordle
-// @version     0.3.9
+// @version     0.3.10
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -11,7 +11,7 @@
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
 // @require     https://gitlab.com/MysteryBlokHed/greasetools/-/raw/v0.5.0/greasetools.user.js
-// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.4.0/ls-proxy.min.user.js
+// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.5.0/ls-proxy.min.user.js
 // @resource    wordList https://gitlab.com/MysteryBlokHed/userscripts/-/raw/main/WordleFinder/words.txt
 // @grant       GM.getResourceUrl
 // @grant       GM.xmlHttpRequest

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Wordle Devtools
 // @description Functions and objects to mess with Wordle from the developer console
-// @version     0.1.1
+// @version     0.1.2
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -10,7 +10,7 @@
 // @supportURL  https://gitlab.com/MysteryBlokHed/userscripts/-/issues
 // @match       *://*.nytimes.com/games/wordle*
 // @match       *://*.powerlanguage.co.uk/wordle*
-// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.4.0/ls-proxy.min.user.js
+// @require     https://gitlab.com/MysteryBlokHed/ls-proxy/-/raw/v0.5.0/ls-proxy.min.user.js
 // ==/UserScript==
 /// <reference types="ls-proxy" />
 ;(() => {
