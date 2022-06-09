@@ -7,7 +7,8 @@ Undo accidental time changes in YouTube videos.
 After installing the script, any time changes on YouTube videos will automatically be recorded,
 eg. going back/forth in a video with the arrows or jumping to a time with the number key.
 
-To undo a time change, press `Ctrl` + `Z`.
+To undo a time change, press `Ctrl` + `Z`.  
+To redo a time change, press `Ctrl` + `Y`.
 
 ## Time changes tracked
 

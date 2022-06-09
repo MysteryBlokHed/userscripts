@@ -14,7 +14,7 @@
 ;(() => {
   var _a
   /** Whether to log basic debug events */
-  const DEBUG_LOGS = false
+  const DEBUG_LOGS = true
   const debug = DEBUG_LOGS
     ? (...args) => console.debug('[YouTube Undo]', ...args)
     : () => {}
@@ -26,11 +26,29 @@
     const currentTime = player.getCurrentTime()
     roughTime = currentTime
   }, ROUGH_TIME_RATE * 1000)
+  /**
+   * Track the index in the array that matches the current state of undo's/redo's.
+   * Used to allow undoing and redoing back and forth
+   */
+  let undoPoint = -1
   /** Time change events */
   const timeChanges = []
-  /** The last time change event */
+  const addChange = change => {
+    debug('Adding change to', timeChanges)
+    timeChanges.length = undoPoint + 1
+    timeChanges.push(change)
+    undoPoint = timeChanges.length - 1
+    debug('After:', timeChanges)
+  }
+  /** The current time change event, using `undoPoint` */
+  const currentChange = () => {
+    var _a
+    return (_a = timeChanges[undoPoint]) !== null && _a !== void 0 ? _a : null
+  }
+  /** The last time change event in the list */
   const lastChange = () =>
     timeChanges.length ? timeChanges[timeChanges.length - 1] : null
+  /** Get the last change's time if it exists, otherwise use the rough time */
   const lastOrRough = () => {
     var _a, _b
     return (_b =
@@ -48,6 +66,7 @@
   // Clear events on location changes
   window.addEventListener('yt-navigate-finish', () => {
     timeChanges.length = 0
+    undoPoint = -1
     debug('New video, clearing event list')
   })
   // Watch for playbar clicks
@@ -56,7 +75,7 @@
     ? void 0
     : _a.addEventListener('click', () => {
         const currentTime = player.getCurrentTime()
-        timeChanges.push({
+        addChange({
           before: lastOrRough(),
           after: currentTime,
         })
@@ -76,20 +95,27 @@
       if (
         (last === null || last === void 0 ? void 0 : last.after) !== currentTime
       ) {
-        timeChanges.push({
+        addChange({
           before: lastOrRough(),
           after: currentTime,
         })
       }
-    } else if (ev.ctrlKey && ev.key.toLowerCase() == 'z') {
+    } else if (ev.ctrlKey && ev.key.toLowerCase() === 'z') {
       // Ctrl + Z
-      const last = lastChange()
+      const undoTo = currentChange()
       debug('Ctrl + Z pressed')
-      debug('Last:', last)
-      if (last) {
-        player.seekTo(last.before)
-        timeChanges.pop()
-      }
+      debug('Full list:', timeChanges)
+      debug('Undoing to:', undoTo, 'at index', undoPoint)
+      if (undoTo) player.seekTo(undoTo.before)
+      if (undoPoint >= 0) undoPoint--
+    } else if (ev.ctrlKey && ev.key.toLowerCase() === 'y') {
+      // Ctrl + Y
+      if (undoPoint < timeChanges.length - 1) undoPoint++
+      const redoTo = currentChange()
+      debug('Ctrl + Y pressed')
+      debug('Full list:', timeChanges)
+      debug('Redoing to:', redoTo, 'at index', undoPoint)
+      if (redoTo) player.seekTo(redoTo.after)
     }
   })
 })()
