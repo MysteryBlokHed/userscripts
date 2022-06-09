@@ -13,7 +13,7 @@
 // ==/UserScript==
 ;(() => {
   /** Whether to log basic debug events */
-  const DEBUG_LOGS = true
+  const DEBUG_LOGS = false
   const debug = DEBUG_LOGS
     ? (...args: any[]) => console.debug('[YouTube Undo]', ...args)
     : () => {}
