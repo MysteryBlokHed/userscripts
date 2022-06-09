@@ -14,4 +14,4 @@ To undo a time change, press `Ctrl` + `Z`.
 - [x] Back/forth with arrow keys
 - [x] Back/forth with `J` and `L`
 - [x] Jumping with number keys
-- [ ] Clicking on the playbar (SOON™)
+- [x] Clicking on the playbar
