@@ -45,6 +45,11 @@
     console.error('[YouTube Undo]', 'Player not found!')
     return
   }
+  // Clear events on location changes
+  window.addEventListener('yt-navigate-finish', () => {
+    timeChanges.length = 0
+    debug('New video, clearing event list')
+  })
   // Watch for playbar clicks
   ;(_a = document.querySelector('div.ytp-progress-bar')) === null ||
   _a === void 0

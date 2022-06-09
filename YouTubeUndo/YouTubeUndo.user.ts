@@ -61,6 +61,12 @@
     return
   }
 
+  // Clear events on location changes
+  window.addEventListener('yt-navigate-finish', () => {
+    timeChanges.length = 0
+    debug('New video, clearing event list')
+  })
+
   // Watch for playbar clicks
   document
     .querySelector<HTMLDivElement>('div.ytp-progress-bar')
