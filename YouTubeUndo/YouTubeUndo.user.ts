@@ -20,11 +20,6 @@
 
   /** The interval **in seconds** to check the player's current time */
   const ROUGH_TIME_RATE = 2
-  /**
-   * The time **in seconds** that is considered a large enough jump from the last time
-   * to track as a time change event. Only applies for time changes that aren't caused by tracked hotkeys
-   */
-  const JUMP_THRESHOLD = 10
 
   /** A partial version of the YouTube Player interface used by the UserScript */
   interface YouTubePlayer {
@@ -67,6 +62,7 @@
     roughTime = currentTime
   }, ROUGH_TIME_RATE * 1000)
 
+  // Watch for playbar clicks
   document
     .querySelector<HTMLDivElement>('div.ytp-progress-bar')
     ?.addEventListener('click', () => {
@@ -80,27 +76,28 @@
       debug('Added time change for playbar seek', lastChange()!)
     })
 
+  // Watch for keypresses
   window.addEventListener('keydown', ev => {
     if (ev.key.match(/^(?:\d|j|l|ArrowLeft|ArrowRight)$/i)) {
       // A key that might change the current time
 
       const last = lastChange()
-      const time = player.getCurrentTime()
+      const currentTime = player.getCurrentTime()
 
       debug('Time-changing key pressed')
       debug('Last:', last)
-      debug('Current:', time)
+      debug('Current:', currentTime)
       if (!last) debug('Rough Time:', roughTime)
-      debug('Condition check:', last?.after !== time)
 
-      if (last?.after !== time) {
+      if (last?.after !== currentTime) {
         timeChanges.push({
           before: lastOrRough(),
-          after: time,
+          after: currentTime,
         })
       }
     } else if (ev.ctrlKey && ev.key.toLowerCase() == 'z') {
       // Ctrl + Z
+
       const last = lastChange()
 
       debug('Ctrl + Z pressed')

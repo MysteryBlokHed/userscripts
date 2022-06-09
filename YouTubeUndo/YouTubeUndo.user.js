@@ -20,11 +20,6 @@
     : () => {}
   /** The interval **in seconds** to check the player's current time */
   const ROUGH_TIME_RATE = 2
-  /**
-   * The time **in seconds** that is considered a large enough jump from the last time
-   * to track as a time change event. Only applies for time changes that aren't caused by tracked hotkeys
-   */
-  const JUMP_THRESHOLD = 10
   /** Keep track of the current player time while no events are in the array */
   let roughTime = 0
   /** Time change events */
@@ -51,6 +46,7 @@
     const currentTime = player.getCurrentTime()
     roughTime = currentTime
   }, ROUGH_TIME_RATE * 1000)
+  // Watch for playbar clicks
   ;(_a = document.querySelector('div.ytp-progress-bar')) === null ||
   _a === void 0
     ? void 0
@@ -63,23 +59,22 @@
         roughTime = currentTime
         debug('Added time change for playbar seek', lastChange())
       })
+  // Watch for keypresses
   window.addEventListener('keydown', ev => {
     if (ev.key.match(/^(?:\d|j|l|ArrowLeft|ArrowRight)$/i)) {
       // A key that might change the current time
       const last = lastChange()
-      const time = player.getCurrentTime()
+      const currentTime = player.getCurrentTime()
       debug('Time-changing key pressed')
       debug('Last:', last)
-      debug('Current:', time)
+      debug('Current:', currentTime)
       if (!last) debug('Rough Time:', roughTime)
-      debug(
-        'Condition check:',
-        (last === null || last === void 0 ? void 0 : last.after) !== time,
-      )
-      if ((last === null || last === void 0 ? void 0 : last.after) !== time) {
+      if (
+        (last === null || last === void 0 ? void 0 : last.after) !== currentTime
+      ) {
         timeChanges.push({
           before: lastOrRough(),
-          after: time,
+          after: currentTime,
         })
       }
     } else if (ev.ctrlKey && ev.key.toLowerCase() == 'z') {
