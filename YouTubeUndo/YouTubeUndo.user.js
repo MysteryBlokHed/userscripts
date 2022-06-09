@@ -28,7 +28,6 @@
   }, ROUGH_TIME_RATE * 1000)
   /** Time change events */
   const timeChanges = []
-  window.timeChanges = timeChanges
   /** The last time change event */
   const lastChange = () =>
     timeChanges.length ? timeChanges[timeChanges.length - 1] : null

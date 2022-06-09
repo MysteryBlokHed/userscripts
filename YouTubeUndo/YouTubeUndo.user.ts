@@ -44,7 +44,6 @@
 
   /** Time change events */
   const timeChanges: TimeChange[] = []
-  ;(window as any).timeChanges = timeChanges
 
   /** The last time change event */
   const lastChange = () =>
