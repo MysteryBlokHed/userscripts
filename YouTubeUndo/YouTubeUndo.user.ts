@@ -37,6 +37,11 @@
   /** Keep track of the current player time while no events are in the array */
   let roughTime = 0
 
+  setInterval(() => {
+    const currentTime = player.getCurrentTime()
+    roughTime = currentTime
+  }, ROUGH_TIME_RATE * 1000)
+
   /** Time change events */
   const timeChanges: TimeChange[] = []
   ;(window as any).timeChanges = timeChanges
@@ -56,11 +61,6 @@
     console.error('[YouTube Undo]', 'Player not found!')
     return
   }
-
-  setInterval(() => {
-    const currentTime = player.getCurrentTime()
-    roughTime = currentTime
-  }, ROUGH_TIME_RATE * 1000)
 
   // Watch for playbar clicks
   document
