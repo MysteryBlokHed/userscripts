@@ -13,7 +13,7 @@
 // ==/UserScript==
 ;(() => {
   /** Whether to log basic debug events */
-  const DEBUG_LOGS = true
+  const DEBUG_LOGS = false
   const debug = DEBUG_LOGS
     ? (...args: any[]) => console.debug('[YouTube Undo]', ...args)
     : () => {}
@@ -52,7 +52,7 @@
   const timeChanges: TimeChange[] = []
 
   const addChange = (change: TimeChange) => {
-    debug('Adding change to', timeChanges)
+    debug('Adding change event to', timeChanges)
     timeChanges.length = undoPoint + 1
     timeChanges.push(change)
     undoPoint = timeChanges.length - 1
