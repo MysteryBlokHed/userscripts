@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        YouTube Undo
-// @description Undo changes in playback position on YouTube
-// @version     0.1.0
+// @description Undo and redo changes in playback position on YouTube
+// @version     0.2.0
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0

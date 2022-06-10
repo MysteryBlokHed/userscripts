@@ -1,6 +1,6 @@
 # YouTube Undo
 
-Undo accidental time changes in YouTube videos.
+Undo and redo changes in playback position on YouTube.
 
 ## Use
 
