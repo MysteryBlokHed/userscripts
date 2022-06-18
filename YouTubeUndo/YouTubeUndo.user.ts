@@ -66,12 +66,17 @@
 
   // prettier-ignore
   /** The YouTube player */
-  const player = document.getElementById(
-      'movie_player',
-    ) as HTMLDivElement & YouTubePlayer
+  const getPlayer = () => document.getElementById(
+    'movie_player',
+  ) as (HTMLDivElement & YouTubePlayer) | null
 
   /** Set up event listeners and intervals */
   const setup = () => {
+    const player = getPlayer()
+    if (!player) return
+
+    debug('Player found, running setup')
+
     setInterval(() => {
       const currentTime = player.getCurrentTime()
       roughTime = currentTime
@@ -79,9 +84,11 @@
 
     // Clear events on location changes
     window.addEventListener('yt-navigate-finish', () => {
+      debug('Navigate finished')
+      debug('Player:', player)
       timeChanges.length = 0
       undoPoint = -1
-      debug('New video, clearing event list')
+      debug('New page, clearing event list')
     })
 
     // Watch for playbar clicks
@@ -144,10 +151,18 @@
     })
   }
 
-  if (!player) {
+  if (!getPlayer()) {
     debug('Player not found!')
     debug('Page is probably not an active video.')
-    window.addEventListener('yt-navigate-finish', () => setup(), { once: true })
+
+    const listener = () => {
+      debug('Re-checking for player...')
+      if (getPlayer()) {
+        setup()
+        window.removeEventListener('yt-navigate-finish', listener)
+      }
+    }
+    window.addEventListener('yt-navigate-finish', listener)
   } else {
     setup()
   }
