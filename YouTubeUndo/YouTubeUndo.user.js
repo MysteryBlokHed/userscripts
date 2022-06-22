@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        YouTube Undo
 // @description Undo and redo changes in playback position on YouTube
-// @version     0.2.1
+// @version     0.2.2
 // @author      Adam Thompson-Sharpe
 // @namespace   MysteryBlokHed
 // @license     GPL-3.0
@@ -105,6 +105,7 @@
             after: currentTime,
           })
         }
+        roughTime = currentTime
       } else if (ev.ctrlKey && ev.key.toLowerCase() === 'z') {
         // Ctrl + Z
         const undoTo = currentChange()
