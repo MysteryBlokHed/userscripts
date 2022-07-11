@@ -42,7 +42,7 @@
       .then(r => r.json())
       .then(json => json.eventUserAccountId)
   }
-  const validateRemoveShiftOptions = options => {
+  const validateUnscheduleShiftOptions = options => {
     var _a
     const auth =
       (options === null || options === void 0 ? void 0 : options.auth) ||
@@ -77,9 +77,9 @@
     }
     return { auth, user, event, isEventUserAccountId }
   }
-  const validateAddShiftOptions = options => {
+  const validateScheduleShiftOptions = options => {
     const { auth, user, event, isEventUserAccountId } =
-      validateRemoveShiftOptions(options)
+      validateUnscheduleShiftOptions(options)
     const org =
       (options === null || options === void 0 ? void 0 : options.org) ||
       JSON.parse(localStorage['mainNavCurrentOrgId'])
@@ -138,7 +138,7 @@
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, org, event, isEventUserAccountId } =
-        validateAddShiftOptions(options)
+        validateScheduleShiftOptions(options)
       const ids = convertShifts(id)
       const eventUserId = isEventUserAccountId
         ? user
@@ -164,7 +164,7 @@
     async unscheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, event, isEventUserAccountId } =
-        validateRemoveShiftOptions(options)
+        validateUnscheduleShiftOptions(options)
       const ids = convertShifts(id)
       const eventUserId = isEventUserAccountId
         ? user

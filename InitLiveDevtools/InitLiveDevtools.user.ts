@@ -53,9 +53,9 @@
       .then(json => json.eventUserAccountId)
   }
 
-  const validateRemoveShiftOptions = (
-    options?: RemoveShiftOptions,
-  ): Required<RemoveShiftOptions> => {
+  const validateUnscheduleShiftOptions = (
+    options?: UnscheduleShiftOptions,
+  ): Required<UnscheduleShiftOptions> => {
     const auth = options?.auth || JSON.parse(localStorage['authToken'])
     const user = options?.user || JSON.parse(localStorage['userAccountId'])
     const event =
@@ -81,11 +81,11 @@
     return { auth, user, event, isEventUserAccountId }
   }
 
-  const validateAddShiftOptions = (
-    options?: AddShiftOptions,
-  ): Required<AddShiftOptions> => {
+  const validateScheduleShiftOptions = (
+    options?: ScheduleShiftOptions,
+  ): Required<ScheduleShiftOptions> => {
     const { auth, user, event, isEventUserAccountId } =
-      validateRemoveShiftOptions(options)
+      validateUnscheduleShiftOptions(options)
     const org = options?.org || JSON.parse(localStorage['mainNavCurrentOrgId'])
 
     if (!org) {
@@ -150,7 +150,7 @@
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, org, event, isEventUserAccountId } =
-        validateAddShiftOptions(options)
+        validateScheduleShiftOptions(options)
       const ids = convertShifts(id)
 
       const eventUserId = isEventUserAccountId
@@ -180,7 +180,7 @@
     async unscheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, event, isEventUserAccountId } =
-        validateRemoveShiftOptions(options)
+        validateUnscheduleShiftOptions(options)
       const ids = convertShifts(id)
 
       const eventUserId = isEventUserAccountId
@@ -211,7 +211,7 @@
   }
 })()
 
-interface RemoveShiftOptions {
+interface UnscheduleShiftOptions {
   /** The user ID (attempts to infer if not provided) */
   user?: string | number
   /** The event ID (attempts to infer if not provided) */
@@ -230,7 +230,7 @@ interface RemoveShiftOptions {
   auth?: string
 }
 
-interface AddShiftOptions extends RemoveShiftOptions {
+interface ScheduleShiftOptions extends UnscheduleShiftOptions {
   /** The organization ID (attempts to infer if not provided) */
   org?: string | number
 }
@@ -251,13 +251,13 @@ interface ILDevtools {
   /** Schedule yourself for a shift or shifts */
   scheduleShift(
     id: string | number | Array<string | number>,
-    options?: AddShiftOptions,
+    options?: ScheduleShiftOptions,
   ): Promise<Response>
 
   /** Unschedule yourself for a shift or shifts */
   unscheduleShift(
     id: string | number | Array<string | number>,
-    options?: RemoveShiftOptions,
+    options?: UnscheduleShiftOptions,
   ): Promise<Response>
 }
 
