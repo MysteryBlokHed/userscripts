@@ -60,7 +60,6 @@
     const user = options?.user || JSON.parse(localStorage['userAccountId'])
     const event =
       options?.event || JSON.parse(localStorage['mainNavCurrentEventId'])
-    const isEventUserAccountId = options?.isEventUserAccountId ?? false
 
     if (!auth) {
       throw new TypeError(
@@ -78,14 +77,13 @@
       )
     }
 
-    return { auth, user, event, isEventUserAccountId }
+    return { auth, user, event }
   }
 
   const validateScheduleShiftOptions = (
     options?: ScheduleShiftOptions,
   ): Required<ScheduleShiftOptions> => {
-    const { auth, user, event, isEventUserAccountId } =
-      validateUnscheduleShiftOptions(options)
+    const { auth, user, event } = validateUnscheduleShiftOptions(options)
     const org = options?.org || JSON.parse(localStorage['mainNavCurrentOrgId'])
 
     if (!org) {
@@ -94,7 +92,7 @@
       )
     }
 
-    return { auth, user, org, event, isEventUserAccountId }
+    return { auth, user, org, event }
   }
 
   window.ILDevtools = {
@@ -149,13 +147,10 @@
 
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
-      const { auth, user, org, event, isEventUserAccountId } =
-        validateScheduleShiftOptions(options)
+      const { auth, user, org, event } = validateScheduleShiftOptions(options)
       const ids = convertShifts(id)
 
-      const eventUserId = isEventUserAccountId
-        ? user
-        : await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId(user, event, auth)
 
       debug('Event User ID:', eventUserId)
       debug('Scheduling for shift(s)', ids, 'for org', org, 'and event', event)
@@ -179,13 +174,10 @@
 
     async unscheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
-      const { auth, user, event, isEventUserAccountId } =
-        validateUnscheduleShiftOptions(options)
+      const { auth, user, event } = validateUnscheduleShiftOptions(options)
       const ids = convertShifts(id)
 
-      const eventUserId = isEventUserAccountId
-        ? user
-        : await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId(user, event, auth)
 
       debug('Event User ID:', eventUserId)
       debug('Unscheduling for shift(s)', ids, 'for event', event)
@@ -216,12 +208,6 @@ interface UnscheduleShiftOptions {
   user?: string | number
   /** The event ID (attempts to infer if not provided) */
   event?: string | number
-  /**
-   * Whether the provided ID is the eventUserAccountId.
-   * Only change this if the `user` parameter being passed is the result of `getEventUserAccountId`
-   * @default false
-   */
-  isEventUserAccountId?: boolean | undefined
   /**
    * Auth token (attempts to infer if not provided)
    * @example 'Basic Szdlc0EyfUMtb29SfDtAKHZxNyI9OkkqLHlxPlR4KlpifURVcEZqWGxOdHMrLntmQkM3anc='

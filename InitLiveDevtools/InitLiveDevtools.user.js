@@ -42,7 +42,6 @@
     return response.eventUserAccountId
   }
   const validateUnscheduleShiftOptions = options => {
-    var _a
     const auth =
       (options === null || options === void 0 ? void 0 : options.auth) ||
       JSON.parse(localStorage['authToken'])
@@ -52,13 +51,6 @@
     const event =
       (options === null || options === void 0 ? void 0 : options.event) ||
       JSON.parse(localStorage['mainNavCurrentEventId'])
-    const isEventUserAccountId =
-      (_a =
-        options === null || options === void 0
-          ? void 0
-          : options.isEventUserAccountId) !== null && _a !== void 0
-        ? _a
-        : false
     if (!auth) {
       throw new TypeError(
         '[InitLive Devtools] User ID was not provided and could not be inferred from localStorage',
@@ -74,11 +66,10 @@
         '[InitLive Devtools] Event ID was not provided and could not be inferred from localStorage',
       )
     }
-    return { auth, user, event, isEventUserAccountId }
+    return { auth, user, event }
   }
   const validateScheduleShiftOptions = options => {
-    const { auth, user, event, isEventUserAccountId } =
-      validateUnscheduleShiftOptions(options)
+    const { auth, user, event } = validateUnscheduleShiftOptions(options)
     const org =
       (options === null || options === void 0 ? void 0 : options.org) ||
       JSON.parse(localStorage['mainNavCurrentOrgId'])
@@ -87,7 +78,7 @@
         '[InitLive Devtools] Org ID was not provided and could not be inferred from localStorage',
       )
     }
-    return { auth, user, org, event, isEventUserAccountId }
+    return { auth, user, org, event }
   }
   window.ILDevtools = {
     debug: true,
@@ -136,12 +127,9 @@
     },
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
-      const { auth, user, org, event, isEventUserAccountId } =
-        validateScheduleShiftOptions(options)
+      const { auth, user, org, event } = validateScheduleShiftOptions(options)
       const ids = convertShifts(id)
-      const eventUserId = isEventUserAccountId
-        ? user
-        : await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId(user, event, auth)
       debug('Event User ID:', eventUserId)
       debug('Scheduling for shift(s)', ids, 'for org', org, 'and event', event)
       return await fetch(
@@ -162,12 +150,9 @@
     },
     async unscheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
-      const { auth, user, event, isEventUserAccountId } =
-        validateUnscheduleShiftOptions(options)
+      const { auth, user, event } = validateUnscheduleShiftOptions(options)
       const ids = convertShifts(id)
-      const eventUserId = isEventUserAccountId
-        ? user
-        : await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId(user, event, auth)
       debug('Event User ID:', eventUserId)
       debug('Unscheduling for shift(s)', ids, 'for event', event)
       const bulk = ids.map(id => ({
