@@ -21,6 +21,27 @@
     if (typeof id !== 'object') id = [id]
     return id.map(id => (typeof id === 'string' ? parseInt(id) : id))
   }
+  /**
+   * Gets the `eventUserAccountId` property, which is used for some requests
+   * @param user The user ID
+   * @param event The event ID
+   * @param auth Auth token
+   */
+  const getEventUserAccountId = (user, event, auth) => {
+    const time = new Date().toISOString()
+    return fetch(
+      `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: '*/*',
+          Authorization: auth,
+        },
+      },
+    )
+      .then(r => r.json())
+      .then(json => json.eventUserAccountId)
+  }
   const validateRemoveShiftOptions = options => {
     var _a
     const auth =
@@ -114,21 +135,6 @@
         debug('Not on shift selection page')
       }
     },
-    getEventUserAccountId(user, event, auth) {
-      const time = new Date().toISOString()
-      return fetch(
-        `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
-        {
-          method: 'GET',
-          headers: {
-            Accept: '*/*',
-            Authorization: auth,
-          },
-        },
-      )
-        .then(r => r.json())
-        .then(json => json.eventUserAccountId)
-    },
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, org, event, isEventUserAccountId } =
@@ -136,7 +142,7 @@
       const ids = convertShifts(id)
       const eventUserId = isEventUserAccountId
         ? user
-        : await ILDevtools.getEventUserAccountId(user, event, auth)
+        : await getEventUserAccountId(user, event, auth)
       debug('Event User ID:', eventUserId)
       debug('Scheduling for shift(s)', ids, 'for org', org, 'and event', event)
       return await fetch(
@@ -162,7 +168,7 @@
       const ids = convertShifts(id)
       const eventUserId = isEventUserAccountId
         ? user
-        : await ILDevtools.getEventUserAccountId(user, event, auth)
+        : await getEventUserAccountId(user, event, auth)
       debug('Event User ID:', eventUserId)
       debug('Unscheduling for shift(s)', ids, 'for event', event)
       const bulk = ids.map(id => ({

@@ -27,6 +27,32 @@
     return id.map(id => (typeof id === 'string' ? parseInt(id) : id))
   }
 
+  /**
+   * Gets the `eventUserAccountId` property, which is used for some requests
+   * @param user The user ID
+   * @param event The event ID
+   * @param auth Auth token
+   */
+  const getEventUserAccountId = (
+    user: string | number,
+    event: string | number,
+    auth: string,
+  ) => {
+    const time = new Date().toISOString()
+    return fetch(
+      `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: '*/*',
+          Authorization: auth,
+        },
+      },
+    )
+      .then(r => r.json())
+      .then(json => json.eventUserAccountId)
+  }
+
   const validateRemoveShiftOptions = (
     options?: RemoveShiftOptions,
   ): Required<RemoveShiftOptions> => {
@@ -121,26 +147,6 @@
       }
     },
 
-    getEventUserAccountId(
-      user: string | number,
-      event: string | number,
-      auth: string,
-    ) {
-      const time = new Date().toISOString()
-      return fetch(
-        `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
-        {
-          method: 'GET',
-          headers: {
-            Accept: '*/*',
-            Authorization: auth,
-          },
-        },
-      )
-        .then(r => r.json())
-        .then(json => json.eventUserAccountId)
-    },
-
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, org, event, isEventUserAccountId } =
@@ -149,7 +155,7 @@
 
       const eventUserId = isEventUserAccountId
         ? user
-        : await ILDevtools.getEventUserAccountId(user, event, auth)
+        : await getEventUserAccountId(user, event, auth)
 
       debug('Event User ID:', eventUserId)
       debug('Scheduling for shift(s)', ids, 'for org', org, 'and event', event)
@@ -179,7 +185,7 @@
 
       const eventUserId = isEventUserAccountId
         ? user
-        : await ILDevtools.getEventUserAccountId(user, event, auth)
+        : await getEventUserAccountId(user, event, auth)
 
       debug('Event User ID:', eventUserId)
       debug('Unscheduling for shift(s)', ids, 'for event', event)
@@ -241,18 +247,6 @@ interface ILDevtools {
 
   /** Show/enable hidden/disabled checkboxes for shfits */
   showShiftChecks(): void
-
-  /**
-   * Gets the `eventUserAccountId` property, which is used for some requests
-   * @param user The user ID
-   * @param event The event ID
-   * @param auth Auth token
-   */
-  getEventUserAccountId(
-    user: string | number,
-    event: string | number,
-    auth: string,
-  ): Promise<number>
 
   /** Schedule yourself for a shift or shifts */
   scheduleShift(
