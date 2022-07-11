@@ -22,26 +22,12 @@
     return id.map(id => (typeof id === 'string' ? parseInt(id) : id))
   }
   /**
-   * Gets the `eventUserAccountId` property, which is used for some requests
-   * @param user The user ID
-   * @param event The event ID
-   * @param auth Auth token
+   * Gets the `eventUserAccountId` property, which is used for some requests.
+   * This just calls `getEventUserInfo` and gets the relevant key from it
    */
-  const getEventUserAccountId = async (user, event, auth) => {
-    const time = new Date().toISOString()
-    const response = await fetch(
-      `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: '*/*',
-          Authorization: auth,
-        },
-      },
-    ).then(r => r.json())
-    return response.eventUserAccountId
-  }
-  const validateUnscheduleShiftOptions = options => {
+  const getEventUserAccountId = options =>
+    ILDevtools.getEventUserInfo(options).then(info => info.eventUserAccountId)
+  const validateCommonOptions = options => {
     const auth =
       (options === null || options === void 0 ? void 0 : options.auth) ||
       JSON.parse(localStorage['authToken'])
@@ -69,7 +55,7 @@
     return { auth, user, event }
   }
   const validateScheduleShiftOptions = options => {
-    const { auth, user, event } = validateUnscheduleShiftOptions(options)
+    const { auth, user, event } = validateCommonOptions(options)
     const org =
       (options === null || options === void 0 ? void 0 : options.org) ||
       JSON.parse(localStorage['mainNavCurrentOrgId'])
@@ -125,11 +111,28 @@
         debug('Not on shift selection page')
       }
     },
+    async getEventUserInfo(options) {
+      const { auth, user, event } = validateCommonOptions(options)
+      const time = new Date().toISOString()
+      const response = await fetch(
+        `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
+        {
+          method: 'GET',
+          headers: {
+            Accept: '*/*',
+            Authorization: auth,
+          },
+        },
+      ).then(r => r.json())
+      // This is unsafe and unvalidated, but InitLive probably wouldn't just change
+      // their API without notice and without adding a version to the URL. Probably
+      return response
+    },
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, org, event } = validateScheduleShiftOptions(options)
       const ids = convertShifts(id)
-      const eventUserId = await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId({ auth, user, event })
       debug('Event User ID:', eventUserId)
       debug('Scheduling for shift(s)', ids, 'for org', org, 'and event', event)
       return await fetch(
@@ -150,9 +153,9 @@
     },
     async unscheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
-      const { auth, user, event } = validateUnscheduleShiftOptions(options)
+      const { auth, user, event } = validateCommonOptions(options)
       const ids = convertShifts(id)
-      const eventUserId = await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId({ auth, user, event })
       debug('Event User ID:', eventUserId)
       debug('Unscheduling for shift(s)', ids, 'for event', event)
       const bulk = ids.map(id => ({

@@ -28,34 +28,15 @@
   }
 
   /**
-   * Gets the `eventUserAccountId` property, which is used for some requests
-   * @param user The user ID
-   * @param event The event ID
-   * @param auth Auth token
+   * Gets the `eventUserAccountId` property, which is used for some requests.
+   * This just calls `getEventUserInfo` and gets the relevant key from it
    */
-  const getEventUserAccountId = async (
-    user: string | number,
-    event: string | number,
-    auth: string,
-  ) => {
-    const time = new Date().toISOString()
-    const response = await fetch(
-      `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: '*/*',
-          Authorization: auth,
-        },
-      },
-    ).then(r => r.json())
+  const getEventUserAccountId = (options?: CommonOptions) =>
+    ILDevtools.getEventUserInfo(options).then(info => info.eventUserAccountId)
 
-    return response.eventUserAccountId
-  }
-
-  const validateUnscheduleShiftOptions = (
-    options?: UnscheduleShiftOptions,
-  ): Required<UnscheduleShiftOptions> => {
+  const validateCommonOptions = (
+    options?: CommonOptions,
+  ): Required<CommonOptions> => {
     const auth = options?.auth || JSON.parse(localStorage['authToken'])
     const user = options?.user || JSON.parse(localStorage['userAccountId'])
     const event =
@@ -83,7 +64,7 @@
   const validateScheduleShiftOptions = (
     options?: ScheduleShiftOptions,
   ): Required<ScheduleShiftOptions> => {
-    const { auth, user, event } = validateUnscheduleShiftOptions(options)
+    const { auth, user, event } = validateCommonOptions(options)
     const org = options?.org || JSON.parse(localStorage['mainNavCurrentOrgId'])
 
     if (!org) {
@@ -145,12 +126,32 @@
       }
     },
 
+    async getEventUserInfo(options) {
+      const { auth, user, event } = validateCommonOptions(options)
+      const time = new Date().toISOString()
+
+      const response = await fetch(
+        `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
+        {
+          method: 'GET',
+          headers: {
+            Accept: '*/*',
+            Authorization: auth,
+          },
+        },
+      ).then(r => r.json())
+
+      // This is unsafe and unvalidated, but InitLive probably wouldn't just change
+      // their API without notice and without adding a version to the URL. Probably
+      return response as EventUserInfo
+    },
+
     async scheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
       const { auth, user, org, event } = validateScheduleShiftOptions(options)
       const ids = convertShifts(id)
 
-      const eventUserId = await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId({ auth, user, event })
 
       debug('Event User ID:', eventUserId)
       debug('Scheduling for shift(s)', ids, 'for org', org, 'and event', event)
@@ -174,10 +175,10 @@
 
     async unscheduleShift(id, options) {
       const debug = debugFn(ILDevtools.debug)
-      const { auth, user, event } = validateUnscheduleShiftOptions(options)
+      const { auth, user, event } = validateCommonOptions(options)
       const ids = convertShifts(id)
 
-      const eventUserId = await getEventUserAccountId(user, event, auth)
+      const eventUserId = await getEventUserAccountId({ auth, user, event })
 
       debug('Event User ID:', eventUserId)
       debug('Unscheduling for shift(s)', ids, 'for event', event)
@@ -203,7 +204,39 @@
   }
 })()
 
-interface UnscheduleShiftOptions {
+interface EventUserInfo {
+  supervisor: boolean
+  responseCode: number
+  /** Event-specific user ID. Required for many requests */
+  eventUserAccountId: number
+  userAccountId: number
+  organizationId: number
+  eventId: number
+  dateCreated: number
+  dateModified: number
+  dateLastSignin: number
+  hasClickedEmailLink: boolean
+  isInterestedInEvent: boolean
+  isApprovedForEvent: boolean
+  isSignedIn: boolean
+  isAway: boolean
+  isActive: boolean
+  isAnonymous: boolean
+  isPrivate: boolean
+  isVisible: boolean
+  isEmailAuthorized: boolean
+  isSmsAuthorized: boolean
+  isPostEventHoursRequired: boolean
+  isAccountConfirmed: boolean
+  isSkipOnboarding: boolean
+  hasReceivedGuidedPickAndRequest: boolean
+  isStaffingCompanyAccount: boolean
+  firstName: string
+  lastName: string
+  isSupervisor: boolean
+}
+
+interface CommonOptions {
   /** The user ID (attempts to infer if not provided) */
   user?: string | number
   /** The event ID (attempts to infer if not provided) */
@@ -216,7 +249,7 @@ interface UnscheduleShiftOptions {
   auth?: string
 }
 
-interface ScheduleShiftOptions extends UnscheduleShiftOptions {
+interface ScheduleShiftOptions extends CommonOptions {
   /** The organization ID (attempts to infer if not provided) */
   org?: string | number
 }
@@ -234,6 +267,9 @@ interface ILDevtools {
   /** Show/enable hidden/disabled checkboxes for shfits */
   showShiftChecks(): void
 
+  /** Get event-specific user information from InitLive */
+  getEventUserInfo(options?: CommonOptions): Promise<EventUserInfo>
+
   /** Schedule yourself for a shift or shifts */
   scheduleShift(
     id: string | number | Array<string | number>,
@@ -243,7 +279,7 @@ interface ILDevtools {
   /** Unschedule yourself for a shift or shifts */
   unscheduleShift(
     id: string | number | Array<string | number>,
-    options?: UnscheduleShiftOptions,
+    options?: CommonOptions,
   ): Promise<Response>
 }
 

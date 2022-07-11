@@ -6,12 +6,15 @@ Ignore restrictions when scheduling/unscheduling shifts on [InitLive](https://ww
 
 All methods are available on the global `ILDevtools` object.
 
-| Method            | Description                                                      |
-| ----------------- | ---------------------------------------------------------------- |
-| `showShiftChecks` | Shows checkmarks for full shifts and enables disabled checkmarks |
-| `showShiftIds`    | Shows the IDs of all the available shifts                        |
-| `scheduleShift`   | Schedule yourself for a shift. Accepts one or more ID's          |
-| `unscheduleShift` | Unschedule yourself for a shift. Accepts one or more ID's        |
+| Method                | Description                                                      |
+| --------------------- | ---------------------------------------------------------------- |
+| `showShiftChecks`     | Shows checkmarks for full shifts and enables disabled checkmarks |
+| `showShiftIds`        | Shows the IDs of all the available shifts                        |
+| `getgetEventUserInfo` | Get event-specific user information from InitLive                |
+| `scheduleShift`       | Schedule yourself for a shift. Accepts one or more ID's          |
+| `unscheduleShift`     | Unschedule yourself for a shift. Accepts one or more ID's        |
+
+The specific options available for each function can be found by looking at the TypeScript API.
 
 ## Examples
 
