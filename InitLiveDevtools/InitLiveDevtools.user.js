@@ -27,9 +27,9 @@
    * @param event The event ID
    * @param auth Auth token
    */
-  const getEventUserAccountId = (user, event, auth) => {
+  const getEventUserAccountId = async (user, event, auth) => {
     const time = new Date().toISOString()
-    return fetch(
+    const response = await fetch(
       `https://app.initlive.com/EventUserAccounts/getEventUserAccount?eventId=${event}&time=${time}&userAccountId=${user}`,
       {
         method: 'GET',
@@ -38,9 +38,8 @@
           Authorization: auth,
         },
       },
-    )
-      .then(r => r.json())
-      .then(json => json.eventUserAccountId)
+    ).then(r => r.json())
+    return response.eventUserAccountId
   }
   const validateUnscheduleShiftOptions = options => {
     var _a
